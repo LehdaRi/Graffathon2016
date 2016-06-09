@@ -9,4 +9,4 @@ build/
 
 *.xcf
 *.zip
-*.blend
+*.blend*

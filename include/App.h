@@ -36,19 +36,19 @@ private:
 	uint32_t          ww_, wh_;
 	Canvas            canvas_;
 	GL::ShaderProgram mesh_shader_;
-	GL::ShaderProgram raymarcher_shader_;
-	GL::Texture       image_;
-	GL::Texture       depth_;
-	GL::FBO           framebuffer_;
+	//GL::ShaderProgram raymarcher_shader_;
+	//GL::Texture       image_;
+	//GL::Texture       depth_;
+	//GL::FBO           framebuffer_;
 	double            time_;
 
 	// Head.
-	HeadScene head_scene_;
-	bool      normals_from_texture_;
+	//HeadScene head_scene_;
+	//bool      normals_from_texture_;
 
 	// Skybox.
-	Mesh        cube_;
-	Mesh        torus_;
-	GL::Texture cubemap_;
+	//Mesh        cube_;
+	//Mesh        torus_;
+	//GL::Texture cubemap_;
 };
 #endif // APP_H

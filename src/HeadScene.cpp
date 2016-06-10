@@ -2,6 +2,7 @@
 
 #include "GLUtils.h"
 #include "GLFunctions.h"
+#include "Camera.hpp"
 
 // TEST
 #include <iostream>
@@ -48,7 +49,9 @@ void HeadScene::render(double time, bool normals_from_texture,
 					   int width, int height, GLuint framebuffer)
 {
 	// Perspective.
-	Eigen::Matrix4f P = GLUtils::perspective(width, height, PI / 2, 0.01f);
+	Camera camera;
+	camera.perspective(width, height, PI / 2, 0.01f);
+	Eigen::Matrix4f P = camera.getPerspective();
 
 	// View.
 #define ENV
@@ -141,7 +144,7 @@ void HeadScene::set_light_config(const Eigen::Matrix4f& V) {
 		Eigen::Vector3f(0.2, 0.2, 0.15)
 	};
 	const size_t dir_len = sizeof(dir_world) / sizeof(dir_world[0]);
-	
+
 	// Point lights.
 	const Eigen::Vector3f point_world[] = {
 		Eigen::Vector3f(0.2, 0.1,  0.1),	// Position.
@@ -166,7 +169,7 @@ void HeadScene::set_light_config(const Eigen::Matrix4f& V) {
 	static Eigen::Vector3f dir_view[dir_len];
 	static Eigen::Vector3f point_view[point_len];
 	static bool init = [&]() { // TODO: Profile this.
-		return 
+		return
 			memcpy(dir_view, dir_world, sizeof(dir_world)),
 			memcpy(point_view, point_world, sizeof(point_world)),
 			true;
@@ -209,7 +212,9 @@ void HeadScene::create_env_map_ring(int n,
 	GL::FBO framebuffer;
 
 	// Perspective.
-	Eigen::Matrix4f P = GLUtils::perspective(resolution, resolution, PI / 2, cube_side / 2);
+	Camera camera;
+	camera.perspective(resolution, resolution, PI / 2, cube_side / 2);
+	Eigen::Matrix4f P = camera.getPerspective();
 
 	const Eigen::Vector3f targets[] = {
 		Eigen::Vector3f(1, 0, 0), Eigen::Vector3f(-1, 0, 0),
@@ -286,7 +291,7 @@ void HeadScene::render_head_wall(float x_len, float y_len, int x_num, int y_num,
 
 			auto pos = Eigen::Vector3f(x_pos, y_pos, -1.2);
 			Eigen::Matrix4f M = (Eigen::Matrix4f() << rots[index], pos, 0, 0, 0, 1).finished();
-			
+
 			render_head(M, V, P, normals_from_texture, false, width, height, framebuffer);
 		}
 	}

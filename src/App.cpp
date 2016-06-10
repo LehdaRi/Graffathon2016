@@ -2,6 +2,7 @@
 
 #include "GLFunctions.h"
 #include "GLUtils.h"
+#include "Camera.hpp"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -38,6 +39,7 @@ void App::loop(void) {
 
 		//int width, height;
 		//glfwGetFramebufferSize(window_, &width, &height);
+		time_ += 0.001f;
 
 		glClearColor(0.35, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
@@ -153,9 +155,12 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 	glViewport(0, 0, width, height);
 
 	// Camera.
+	Camera camera;
 	Eigen::Vector3f eye = Eigen::Vector3f(2 * std::sin(time_), 2, 2*std::cos(time_));
-	Eigen::Matrix4f view = GLUtils::look_at(eye);
-	Eigen::Matrix4f projection = GLUtils::perspective(width, height, PI / 2);
+	camera.lookAt(eye);
+	camera.perspective(width, height, PI/2);
+	Eigen::Matrix4f view = camera.getOrientation();
+	Eigen::Matrix4f projection = camera.getPerspective();
 
 	// We'll assume that the mesh is already in world space.
 	Eigen::Matrix4f model_to_clip = projection * view;
@@ -189,9 +194,12 @@ void App::render_on_cube(const GL::Texture& texture, int width, int height, GLui
 	glViewport(0, 0, width, height);
 
 	// Camera.
+	Camera camera;
 	Eigen::Vector3f eye					= Eigen::Vector3f(2 * std::sin(time_), 2, 4 * std::cos(time_));
-	Eigen::Matrix4f view				= GLUtils::look_at(eye);
-	Eigen::Matrix4f projection			= GLUtils::perspective(width, height, PI / 2);
+	camera.lookAt(eye);
+	camera.perspective(width, height, PI/2);
+	Eigen::Matrix4f view				= camera.getOrientation();
+	Eigen::Matrix4f projection			= camera.getPerspective();
 
 	// The cube is already in world space.
 	Eigen::Matrix4f model_to_clip		= projection * view;
@@ -239,9 +247,12 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 	glViewport(0, 0, width, height);
 
 	// Camera.
-	Eigen::Vector3f eye					= Eigen::Vector3f(4 * std::sin(time_), 2, 4 * std::cos(time_));
-	Eigen::Matrix4f view				= GLUtils::look_at(eye);
-	Eigen::Matrix4f projection			= GLUtils::perspective(width, height, PI / 2);
+	Camera camera;
+	Eigen::Vector3f eye					= Eigen::Vector3f(2 * std::sin(time_), 2, 4 * std::cos(time_));
+	camera.lookAt(eye);
+	camera.perspective(width, height, PI/2);
+	Eigen::Matrix4f view				= camera.getOrientation();
+	Eigen::Matrix4f projection			= camera.getPerspective();
 
 	// The cube is already in world space.
 	Eigen::Matrix4f model_to_clip		= projection * view;

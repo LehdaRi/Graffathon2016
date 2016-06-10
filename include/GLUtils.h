@@ -10,9 +10,6 @@
 
 namespace GLUtils
 {
-Eigen::Matrix4f perspective(int width, int height,
-                            float fov, float near = 0.1f, float far = 15.0f);
-
 Eigen::Matrix4f look_at(const Eigen::Vector3f& eye,
                         const Eigen::Vector3f& target = Eigen::Vector3f(0, 0, 0),
                         const Eigen::Vector3f& up_hint = Eigen::Vector3f(0, 1, 0));

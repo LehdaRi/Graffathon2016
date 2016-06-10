@@ -2,7 +2,9 @@
 
 #include "GLFunctions.h"
 #include "GLUtils.h"
+#include "Scene.hpp"
 #include "Camera.hpp"
+#include "MeshComponent.hpp"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -14,20 +16,22 @@ App::App(int argc, char* argv[], sf::Window& window)
     window_(window),
     ww_                     (window.getSize().x),
     wh_                     (window.getSize().y),
-	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
+	//mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
 	time_					(0.0),//(glfwSetTime(0), glfwGetTime()) ),
+	root_                   (SCENE.addNode()),
+	mesh_                   ()
 
-	head_scene_				(HeadScene::simple()),
-	normals_from_texture_	(true),
-	cube_					(Mesh::cube()),
-	torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
+	//head_scene_				(HeadScene::simple()),
+	//normals_from_texture_	(true),
+	//cube_					(Mesh::cube()),
+	//torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
 {
-	//int width, height;
-	//glfwGetFramebufferSize(window_, &width, &height);
+	//image_ = GL::Texture::empty_2D(ww_, wh_);
+	//depth_ = GL::Texture::empty_2D_depth(ww_, wh_);
+	//framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
-	image_ = GL::Texture::empty_2D(ww_, wh_);
-	depth_ = GL::Texture::empty_2D_depth(ww_, wh_);
-	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
+    mesh_.from_obj("res/block_corner_4_4_a.obj");
+    //SCENE.addComponent<MeshComponent>(root_, mesh_);
 
 	glClearColor(0.15, 0.1, 0.1, 1);
 	glEnable(GL_DEPTH_TEST);
@@ -35,27 +39,22 @@ App::App(int argc, char* argv[], sf::Window& window)
 
 void App::loop(void) {
 	while (window_.isOpen()) {
-		//time_ = glfwGetTime();
-
-		//int width, height;
-		//glfwGetFramebufferSize(window_, &width, &height);
-		time_ += 0.001f;
+		time_ += 0.001f;    //TEMP
 
 		glClearColor(0.35, 0.1, 0.1, 1);
-		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
-		head_scene_.render(time_, normals_from_texture_, ww_, wh_, framebuffer_);
+		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+		//head_scene_.render(time_, normals_from_texture_, ww_, wh_, framebuffer_);
 
-		glClearColor(0.15, 0.1, 0.1, 1);
-		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		render_on_cube(image_, ww_, wh_);
+		//glClearColor(0.15, 0.1, 0.1, 1);
+		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//render_on_cube(image_, ww_, wh_);
 
 		window_.display();
 
 		handleEvents();
-		//glfwPollEvents();
 	}
 }
-
+/*
 void App::raymarch(int width, int height, GLuint framebuffer) {
 	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -292,7 +291,7 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 
 	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
-
+*/
 void App::handleEvents(void) {
     sf::Event event;
     while (window_.pollEvent(event)) {

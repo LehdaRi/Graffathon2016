@@ -155,7 +155,7 @@ Mesh Mesh::from_obj(const char* filename) {
                                         normal_indices.push_back(n_indices[i] - 1);
                                 }
                         }
-                        else if (3 == fscanf(file, "//%u %u//%u", &n_indices[1],
+                        else if (3 == fscanf(file, "/%u %u//%u", &n_indices[1],
                                                                   &v_indices[2], &n_indices[2]))
                         {
                                 for (int i = 0; i < 3; ++i) {

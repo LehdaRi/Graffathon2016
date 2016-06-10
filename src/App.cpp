@@ -8,21 +8,24 @@
 
 //--------------------
 
-App::App(int argc, char* argv[])
-:	window_					(1024, 768, "HIKISETMIEHET.EXE"),
+App::App(int argc, char* argv[], sf::Window& window)
+:
+    window_(window),
+    ww_                     (window.getSize().x),
+    wh_                     (window.getSize().y),
 	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
-	time_					( (glfwSetTime(0), glfwGetTime()) ),
+	time_					(0.0),//(glfwSetTime(0), glfwGetTime()) ),
 
 	head_scene_				(HeadScene::simple()),
 	normals_from_texture_	(true),
 	cube_					(Mesh::cube()),
 	torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
 {
-	int width, height;
-	glfwGetFramebufferSize(window_, &width, &height);
+	//int width, height;
+	//glfwGetFramebufferSize(window_, &width, &height);
 
-	image_ = GL::Texture::empty_2D(width, height);
-	depth_ = GL::Texture::empty_2D_depth(width, height);
+	image_ = GL::Texture::empty_2D(ww_, wh_);
+	depth_ = GL::Texture::empty_2D_depth(ww_, wh_);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
 	glClearColor(0.15, 0.1, 0.1, 1);
@@ -30,23 +33,24 @@ App::App(int argc, char* argv[])
 }
 
 void App::loop(void) {
-	while (!glfwWindowShouldClose(window_)) {
-		time_ = glfwGetTime();
+	while (window_.isOpen()) {
+		//time_ = glfwGetTime();
 
-		int width, height;
-		glfwGetFramebufferSize(window_, &width, &height);
+		//int width, height;
+		//glfwGetFramebufferSize(window_, &width, &height);
 
 		glClearColor(0.35, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
-		head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
+		head_scene_.render(time_, normals_from_texture_, ww_, wh_, framebuffer_);
 
 		glClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		render_on_cube(image_, width, height);
+		render_on_cube(image_, ww_, wh_);
 
-		glfwSwapBuffers(window_);
+		window_.display();
 
-		glfwPollEvents();
+		handleEvents();
+		//glfwPollEvents();
 	}
 }
 
@@ -115,7 +119,7 @@ void App::render_texture(const GL::Texture& texture, int width, int height, GLui
 	glViewport(0, 0, width, height);
 
 	GLuint texture_flag_uniform, texture_sampler_uniform;
-	
+
 	texture_flag_uniform = glGetUniformLocation(mesh_shader_, "uTextureFlag");
 	texture_sampler_uniform = glGetUniformLocation(mesh_shader_, "uTextureSampler");
 
@@ -159,7 +163,7 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 
 	// Get the uniform locations from OpenGL.
 	GLuint model_to_clip_uniform, normal_to_world_uniform;
-	
+
 	model_to_clip_uniform = glGetUniformLocation(mesh_shader_, "uModelToClip");
 	normal_to_world_uniform = glGetUniformLocation(mesh_shader_, "uNormalToWorld");
 
@@ -276,6 +280,31 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 	glUseProgram(0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+}
+
+void App::handleEvents(void) {
+    sf::Event event;
+    while (window_.pollEvent(event)) {
+        if (event.type == sf::Event::Closed)
+        {
+            // end the program
+            window_.close();
+        }
+        else if (event.type == sf::Event::Resized)
+        {
+            // adjust the viewport when the window is resized
+            glViewport(0, 0, event.size.width, event.size.height);
+        }
+        else if (event.type == sf::Event::KeyPressed) {
+            switch (event.key.code) {
+            case sf::Keyboard::Escape:
+                window_.close();
+            break;
+            default:
+            break;
+            }
+        }
+    }
 }
 
 //--------------------

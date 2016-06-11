@@ -1,9 +1,6 @@
 #ifndef GL_HEADER_GUARD_
 #define GL_HEADER_GUARD_
 
-#ifndef GLFW_INCLUDE_GLCOREARB
-	#define GLFW_INCLUDE_GLCOREARB
-#endif
 #include <GLFW/glfw3.h>
 
 namespace gl

@@ -7,7 +7,7 @@ DEPDIR   := dep
 
 # These can be modified too.
 CXX      := g++
-# CPPFLAGS := -DGLEW_STATIC
+CPPFLAGS := -DGLFW_INCLUDE_GLCOREARB
 CXXFLAGS := -g -O0 -Wall -Wextra -Wshadow -pedantic
 LDLIBS   := -lGL -lglfw
 INCL     := -Iinclude
@@ -19,7 +19,7 @@ OBJS := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 DEPS := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
 CPPFLAGS += -MMD -MP
 
-.PHONY: clean
+.PHONY: clean run
 
 
 # Default target.
@@ -39,5 +39,8 @@ $(BINDIR) $(OBJDIR) $(DEPDIR):
 clean:
 	$(RM) $(BIN) $(OBJS) $(DEPS)
 	rmdir $(BINDIR) $(OBJDIR) $(DEPDIR)
+
+run: $(BIN)
+	$(BINDIR)/$(NAME)
 
 -include $(DEPS)

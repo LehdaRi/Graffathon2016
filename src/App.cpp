@@ -31,9 +31,8 @@ App::App(int argc, char* argv[])
 	depth_ = GL::Texture::empty_2D_depth(width, height);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
-    mesh_.from_obj("res/head.obj");
-    //printf("%p\n", &mesh_);   //TEMP
-    SCENE.addComponent<MeshComponent>(root_, &torus_);
+    mesh_ = Mesh::from_obj("res/block_corner_4_4_a.obj");
+    SCENE.addComponent<MeshComponent>(root_, &mesh_);
 
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
@@ -53,8 +52,8 @@ void App::loop(void) {
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//SCENE(renderer_);
-		render_mesh(mesh_, 1024, 768);
+		SCENE(renderer_);
+		//render_mesh(mesh_, 1024, 768);
 		//render_on_cube(image_, width, height);
 
 		glfwSwapBuffers(window_);
@@ -163,7 +162,7 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 
 	// Camera.
 	Camera camera;
-	Eigen::Vector3f eye = Eigen::Vector3f(1 * std::sin(time_), 2, 1*std::cos(time_));
+	Eigen::Vector3f eye = Eigen::Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
 	camera.lookAt(eye);
 	camera.perspective(width, height, PI/2);
 	Eigen::Matrix4f view = camera.getOrientation();

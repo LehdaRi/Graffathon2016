@@ -20,3 +20,10 @@ Node& NodeId::operator*(void) const {
 NodeId::operator bool() const {
     return *valid_;
 }
+
+Node& NodeId::ref(void) const {
+    if(*valid_)
+        return SCENE.nodes_[level_].nodes[id_];
+    else
+        throw "Invalid NodeId";
+}

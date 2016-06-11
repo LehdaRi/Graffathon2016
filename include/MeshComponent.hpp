@@ -3,15 +3,20 @@
 
 
 #include "ComponentBase.hpp"
+#include "NodeId.hpp"
 #include "Mesh.h"
 
 
 class MeshComponent : public ComponentBase {
 public:
-    MeshComponent(Mesh& mesh);
+    friend class Renderer;
+
+    MeshComponent(const NodeId& node, Mesh* mesh);
+    MeshComponent(const NodeId& node, const MeshComponent& other);
 
 private:
-    Mesh& mesh_;
+    NodeId node_;
+    Mesh* mesh_;
 };
 
 

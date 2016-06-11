@@ -5,8 +5,11 @@
 #include "Canvas.h"
 #include "Mesh.h"
 #include "GLObjects.h"
-#include "HeadScene.h"
-#include "NodeId.hpp"
+#include "Camera.hpp"
+#include "Building.hpp"
+#include "Renderer.hpp"
+#include "TransformationVisitor.hpp"
+#include "BSpline.h"
 
 #include <cstdint>
 
@@ -14,7 +17,7 @@
 
 class App {
 public:
-	App(int argc, char* argv[]);
+	App(int argc, char* argv[], MainWindow& window);
 	App(const App&) = delete;
 
 	App& operator=(const App&) = delete;
@@ -23,37 +26,29 @@ public:
 	void     loop               (void);
 
 private:
-	void     raymarch           (int width, int height, GLuint framebuffer = 0);
-	void     render_texture     (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	void     render_mesh        (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
-	void     render_on_cube     (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	void     render_on_torus    (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
 	void     postprocess        (const GL::Texture& input, int width, int height, GLuint framebuffer = 0);
-    //void     handleEvents       (void);
 
 private:
 	// Framework objects.
-	MainWindow         window_;
-	Canvas            canvas_;
-	GL::ShaderProgram mesh_shader_;
+	MainWindow&         window_;
+	Canvas              canvas_;
+	Camera              camera_;
+	GL::ShaderProgram   shader_;
 	GL::ShaderProgram postprocess_shader_;
-	GL::ShaderProgram raymarcher_shader_;
-	GL::Texture       image_;
-	GL::Texture       depth_;
-	GL::FBO           framebuffer_;
+	GL::Texture         image_;
+	GL::Texture         depth_;
+	GL::FBO             framebuffer_;
 	double              time_;
 
-	// CodeComponentStuffWtf
-	NodeId              root_;
-	Mesh                mesh_;
+	// NodeComponentStuffWtfThx1338
+	Renderer                renderer_;
+    TransformationVisitor   transVisitor_;
+	Building                building_;
 
-	// Head.
-	HeadScene head_scene_;
-	bool      normals_from_texture_;
+	// Spline.
+	BSpline spline_;
 
 	// Skybox.
-	Mesh        cube_;
-	Mesh        torus_;
-	GL::Texture cubemap_;
+	GL::Texture         cubemap_;
 };
 #endif // APP_H

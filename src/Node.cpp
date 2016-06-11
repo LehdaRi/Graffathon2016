@@ -35,11 +35,3 @@ void Node::print(void) {
 void Node::addChild(const NodeId& nodeId) {
     children_.push_back(nodeId);
 }
-/*
-void Node::invalidateComponents(void) {
-    for (auto& c : components_) {
-        c.second.component->invalidate();
-        c.second.component = nullptr;
-        c.second.id = -1;
-    }
-}*/

@@ -25,7 +25,7 @@ public:
     template <typename T_Component>
     bool hasComponent(void) const;
     template <typename T_Component>
-    const T_Component& getComponent(void) const;
+    T_Component& getComponent(void);
 
 private:
     uint64_t id_;
@@ -65,7 +65,7 @@ bool Node::hasComponent(void) const {
 }
 
 template <typename T_Component>
-const T_Component& Node::getComponent(void) const {
+T_Component& Node::getComponent(void) {
     return *static_cast<T_Component*>(components_.at(ComponentBase::getTypeId<T_Component>()).component);
 }
 

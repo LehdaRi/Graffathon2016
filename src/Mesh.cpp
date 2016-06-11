@@ -9,6 +9,14 @@ using namespace Eigen;
 
 //--------------------
 
+
+
+Mesh::Mesh(const std::string& objFileName) :
+    Mesh()
+{
+    *this = from_obj(objFileName.c_str());
+}
+
 Mesh::Mesh(Mesh&& other)
 :       positions_        (std::move(other.positions_)),
         normals_          (std::move(other.normals_)),

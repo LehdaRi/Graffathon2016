@@ -21,6 +21,8 @@ public:
     Node& operator*(void) const;
     operator bool() const;
 
+    Node& ref(void) const;
+
 private:
     uint64_t id_;
     uint32_t level_;

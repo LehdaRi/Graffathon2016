@@ -75,7 +75,8 @@ void HeadScene::render(double time, bool normals_from_texture,
 	Eigen::Vector3f target = Eigen::Vector3f(0.0, 0.0, -0.075);
 	Eigen::Vector3f eye = target + Eigen::Vector3f(0.25 * std::sin(0.8 * time), 0.0, 0.25 * std::cos(0.8 * time));
 	Eigen::Vector3f up = Eigen::Vector3f(0, 1, 0);
-	Eigen::Matrix4f V = GLUtils::look_at(eye, target, up);
+	camera.lookAt(target, eye, up);
+	Eigen::Matrix4f V = camera.getOrientation();
 
 	for (static char c = 0; !c++;) // Do only once.
 		create_env_map_ring(16, target, 0.02, 1024);
@@ -242,7 +243,8 @@ void HeadScene::create_env_map_ring(int n,
 
 		Eigen::Vector3f target = position + targets[i];
 		Eigen::Vector3f up = ups[i];
-		Eigen::Matrix4f V = GLUtils::look_at(position, target, up);
+		camera.lookAt(position, target, up);
+		Eigen::Matrix4f V = camera.getOrientation();
 
 		set_light_config(V);
 		render_head_ring(n, V, P, true, false, resolution, resolution, framebuffer);

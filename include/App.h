@@ -9,6 +9,7 @@
 #include "NodeId.hpp"
 #include "Camera.hpp"
 #include "Renderer.hpp"
+#include "BSpline.h"
 
 #include <cstdint>
 
@@ -26,10 +27,11 @@ public:
 
 private:
 	//void     raymarch           (int width, int height, GLuint framebuffer = 0);
-	void     render_texture     (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	void     render_mesh        (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
-	void     render_on_cube     (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	void     render_on_torus    (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
+	void     render_texture        (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
+	void     render_mesh           (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
+	void     render_mesh_on_spline (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
+	void     render_on_cube        (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
+	void     render_on_torus       (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
 
 private:
 	// Framework objects.
@@ -47,6 +49,9 @@ private:
 	NodeId              root_;
 	Mesh                mesh_;
 	Renderer            renderer_;
+
+	// Spline.
+	BSpline spline_;
 
 	// Head.
 	HeadScene head_scene_;

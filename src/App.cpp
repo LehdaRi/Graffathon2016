@@ -24,16 +24,34 @@ App::App(int argc, char* argv[])
 	cube_					(Mesh::cube()),
 	torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
 {
+	// Window.
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
 
+	// Textures & framebuffers.
 	image_ = GL::Texture::empty_2D(width, height);
 	depth_ = GL::Texture::empty_2D_depth(width, height);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
+	// Meshes.
     mesh_ = Mesh::from_obj("res/block_corner_4_4_a.obj");
     SCENE.addComponent<MeshComponent>(root_, &mesh_);
 
+	// Spline.
+	spline_.addControlPoint({10, 1, 0});
+	spline_.addControlPoint({10, 1, 10});
+	spline_.addControlPoint({0, 1, 10});
+	spline_.addControlPoint({-10, 1, 10});
+	spline_.addControlPoint({-10, 1, 0});
+	spline_.addControlPoint({-10, 1, -10});
+	spline_.addControlPoint({0, 1, -10});
+	spline_.addControlPoint({0, 3, -5});
+	spline_.addControlPoint({0, 3, -5});
+	spline_.addControlPoint({0, 5, 0});
+	spline_.addControlPoint({5, 10, 5});
+	spline_.addControlPoint({10, 5, 10});
+
+	// Stuff.
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
 }
@@ -45,15 +63,15 @@ void App::loop(void) {
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);
 
-		//gl::ClearColor(0.35, 0.1, 0.1, 1);
+		gl::ClearColor(0.35, 0.1, 0.1, 1);
 		//SCENE(renderer_);
-		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
 		//head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		SCENE(renderer_);
-		//render_mesh(mesh_, 1024, 768);
+		//SCENE(renderer_);
+		render_mesh_on_spline(mesh_, 1024, 768);
 		//render_on_cube(image_, width, height);
 
 		glfwSwapBuffers(window_);
@@ -193,6 +211,45 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
+void App::render_mesh_on_spline(const Mesh& mesh, int width, int height, GLuint framebuffer) {
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	gl::Viewport(0, 0, width, height);
+
+	// Camera.
+	Camera camera;
+	Eigen::Vector3f eye = spline_.evaluate(time_);
+	camera.lookAt(eye);
+	camera.perspective(width, height, PI/2);
+	Eigen::Matrix4f view = camera.getOrientation();
+	Eigen::Matrix4f projection = camera.getPerspective();
+
+	// We'll assume that the mesh is already in world space.
+	Eigen::Matrix4f model_to_clip = projection * view;
+	Eigen::Matrix3f normal_to_world = Eigen::Matrix3f::Identity();
+
+	// Get the uniform locations from OpenGL.
+	GLuint model_to_clip_uniform, normal_to_world_uniform;
+
+	model_to_clip_uniform = gl::GetUniformLocation(mesh_shader_, "uModelToClip");
+	normal_to_world_uniform = gl::GetUniformLocation(mesh_shader_, "uNormalToWorld");
+
+	// Set the uniforms and draw.
+	gl::UseProgram(mesh_shader_);
+
+	gl::UniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
+	gl::UniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
+
+	gl::BindVertexArray(mesh.vao_);
+	gl::DrawArrays(mesh.primitive_type_, 0, mesh.num_vertices_);
+	gl::BindVertexArray(0);
+
+	gl::UseProgram(0);
+
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+}
+
 void App::render_on_cube(const GL::Texture& texture, int width, int height, GLuint framebuffer) {
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
 	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -201,7 +258,8 @@ void App::render_on_cube(const GL::Texture& texture, int width, int height, GLui
 
 	// Camera.
 	Camera camera;
-	Eigen::Vector3f eye					= Eigen::Vector3f(2 * std::sin(time_), 2, 4 * std::cos(time_));
+	Eigen::Vector3f eye = spline_.evaluate(time_);
+	// Eigen::Vector3f eye					= Eigen::Vector3f(2 * std::sin(time_), 2, 4 * std::cos(time_));
 	camera.lookAt(eye);
 	camera.perspective(width, height, PI/2);
 	Eigen::Matrix4f view				= camera.getOrientation();

@@ -11,55 +11,59 @@
 
 //--------------------
 
-App::App(int argc, char* argv[], sf::Window& window)
-:
-    window_(window),
-    ww_                     (window.getSize().x),
-    wh_                     (window.getSize().y),
-	//mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
-	time_					(0.0),//(glfwSetTime(0), glfwGetTime()) ),
-	root_                   (SCENE.addNode()),
-	mesh_                   ()
+App::App(int argc, char* argv[])
+:	window_					(1024, 768, "HIKISETMIEHET.EXE"),
+	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
+	time_					( (glfwSetTime(0), glfwGetTime()) ),
 
-	//head_scene_				(HeadScene::simple()),
-	//normals_from_texture_	(true),
-	//cube_					(Mesh::cube()),
-	//torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
+	root_                   (SCENE.addNode()),
+	mesh_                   (),
+
+	head_scene_				(HeadScene::simple()),
+	normals_from_texture_	(true),
+	cube_					(Mesh::cube()),
+	torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
 {
-	//image_ = GL::Texture::empty_2D(ww_, wh_);
-	//depth_ = GL::Texture::empty_2D_depth(ww_, wh_);
-	//framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
+	int width, height;
+	glfwGetFramebufferSize(window_, &width, &height);
+
+	image_ = GL::Texture::empty_2D(width, height);
+	depth_ = GL::Texture::empty_2D_depth(width, height);
+	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
     mesh_.from_obj("res/block_corner_4_4_a.obj");
     //SCENE.addComponent<MeshComponent>(root_, mesh_);
 
-	glClearColor(0.15, 0.1, 0.1, 1);
-	glEnable(GL_DEPTH_TEST);
+	gl::ClearColor(0.15, 0.1, 0.1, 1);
+	gl::Enable(GL_DEPTH_TEST);
 }
 
 void App::loop(void) {
-	while (window_.isOpen()) {
-		time_ += 0.001f;    //TEMP
+	while (!glfwWindowShouldClose(window_)) {
+		time_ = glfwGetTime();
 
-		glClearColor(0.35, 0.1, 0.1, 1);
-		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
-		//head_scene_.render(time_, normals_from_texture_, ww_, wh_, framebuffer_);
+		int width, height;
+		glfwGetFramebufferSize(window_, &width, &height);
 
-		//glClearColor(0.15, 0.1, 0.1, 1);
-		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//render_on_cube(image_, ww_, wh_);
+		gl::ClearColor(0.35, 0.1, 0.1, 1);
+		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+		head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
 
-		window_.display();
+		gl::ClearColor(0.15, 0.1, 0.1, 1);
+		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		render_on_cube(image_, width, height);
 
-		handleEvents();
+		glfwSwapBuffers(window_);
+
+		glfwPollEvents();
 	}
 }
-/*
-void App::raymarch(int width, int height, GLuint framebuffer) {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+void App::raymarch(int width, int height, GLuint framebuffer) {
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	gl::Viewport(0, 0, width, height);
 
 	// Camera.
 	auto eye				= Eigen::Vector3f(3*std::sin(0.6*time_), 2, 3*std::cos(0.6*time_));
@@ -76,82 +80,82 @@ void App::raymarch(int width, int height, GLuint framebuffer) {
 	GLuint far_uniform, time_uniform;
 	GLuint light_uniform;
 
-	screen_size_uniform		= glGetUniformLocation(raymarcher_shader_, "uScreenSize");
+	screen_size_uniform		= gl::GetUniformLocation(raymarcher_shader_, "uScreenSize");
 
-	eye_uniform				= glGetUniformLocation(raymarcher_shader_, "uEye");
-	forward_uniform			= glGetUniformLocation(raymarcher_shader_, "uForward");
-	right_uniform			= glGetUniformLocation(raymarcher_shader_, "uRight");
-	up_uniform				= glGetUniformLocation(raymarcher_shader_, "uUp");
+	eye_uniform				= gl::GetUniformLocation(raymarcher_shader_, "uEye");
+	forward_uniform			= gl::GetUniformLocation(raymarcher_shader_, "uForward");
+	right_uniform			= gl::GetUniformLocation(raymarcher_shader_, "uRight");
+	up_uniform				= gl::GetUniformLocation(raymarcher_shader_, "uUp");
 
-	far_uniform				= glGetUniformLocation(raymarcher_shader_, "uFar");
-	time_uniform			= glGetUniformLocation(raymarcher_shader_, "uTime");
+	far_uniform				= gl::GetUniformLocation(raymarcher_shader_, "uFar");
+	time_uniform			= gl::GetUniformLocation(raymarcher_shader_, "uTime");
 
-	light_uniform			= glGetUniformLocation(raymarcher_shader_, "uPointLight");
+	light_uniform			= gl::GetUniformLocation(raymarcher_shader_, "uPointLight");
 
 
 	// Set the uniforms and draw.
-	glUseProgram(raymarcher_shader_);
+	gl::UseProgram(raymarcher_shader_);
 
-	glUniform2i(screen_size_uniform, width, height);
+	gl::Uniform2i(screen_size_uniform, width, height);
 
-	glUniform3fv(eye_uniform, 1, eye.data());
-	glUniform3fv(forward_uniform, 1, data_ptr);
-	glUniform3fv(right_uniform, 1, data_ptr + 3);
-	glUniform3fv(up_uniform, 1, data_ptr + 6);
+	gl::Uniform3fv(eye_uniform, 1, eye.data());
+	gl::Uniform3fv(forward_uniform, 1, data_ptr);
+	gl::Uniform3fv(right_uniform, 1, data_ptr + 3);
+	gl::Uniform3fv(up_uniform, 1, data_ptr + 6);
 
-	glUniform1f(far_uniform, 120);
-	glUniform1f(time_uniform, time_);
+	gl::Uniform1f(far_uniform, 120);
+	gl::Uniform1f(time_uniform, time_);
 
-	glUniform3fv(light_uniform, 1, light.data());
+	gl::Uniform3fv(light_uniform, 1, light.data());
 
-	glBindVertexArray(canvas_.vao_);
-	glDrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
-	glBindVertexArray(0);
+	gl::BindVertexArray(canvas_.vao_);
+	gl::DrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
+	gl::BindVertexArray(0);
 
-	glUseProgram(0);
+	gl::UseProgram(0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
 void App::render_texture(const GL::Texture& texture, int width, int height, GLuint framebuffer) {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+	gl::Viewport(0, 0, width, height);
 
 	GLuint texture_flag_uniform, texture_sampler_uniform;
 
-	texture_flag_uniform = glGetUniformLocation(mesh_shader_, "uTextureFlag");
-	texture_sampler_uniform = glGetUniformLocation(mesh_shader_, "uTextureSampler");
+	texture_flag_uniform = gl::GetUniformLocation(mesh_shader_, "uTextureFlag");
+	texture_sampler_uniform = gl::GetUniformLocation(mesh_shader_, "uTextureSampler");
 
-	glUseProgram(mesh_shader_);
+	gl::UseProgram(mesh_shader_);
 
-	glUniform1i(texture_sampler_uniform, 1);
+	gl::Uniform1i(texture_sampler_uniform, 1);
 
-	glUniform1i(texture_flag_uniform, GL_TRUE);
-	GLint old_active; glGetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
-	glActiveTexture(GL_TEXTURE1);
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	gl::Uniform1i(texture_flag_uniform, GL_TRUE);
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE1);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
 
-	glBindVertexArray(canvas_.vao_);
-	glDrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
-	glBindVertexArray(0);
+	gl::BindVertexArray(canvas_.vao_);
+	gl::DrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
+	gl::BindVertexArray(0);
 
-	glBindTexture(GL_TEXTURE_2D, old_tex);
-	glActiveTexture(old_active);
-	glUniform1i(texture_flag_uniform, GL_FALSE);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
+	gl::ActiveTexture(old_active);
+	gl::Uniform1i(texture_flag_uniform, GL_FALSE);
 
-	glUseProgram(0);
+	gl::UseProgram(0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
 void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffer) {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+	gl::Viewport(0, 0, width, height);
 
 	// Camera.
 	Camera camera;
@@ -168,29 +172,29 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 	// Get the uniform locations from OpenGL.
 	GLuint model_to_clip_uniform, normal_to_world_uniform;
 
-	model_to_clip_uniform = glGetUniformLocation(mesh_shader_, "uModelToClip");
-	normal_to_world_uniform = glGetUniformLocation(mesh_shader_, "uNormalToWorld");
+	model_to_clip_uniform = gl::GetUniformLocation(mesh_shader_, "uModelToClip");
+	normal_to_world_uniform = gl::GetUniformLocation(mesh_shader_, "uNormalToWorld");
 
 	// Set the uniforms and draw.
-	glUseProgram(mesh_shader_);
+	gl::UseProgram(mesh_shader_);
 
-	glUniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
-	glUniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
+	gl::UniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
+	gl::UniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
 
-	glBindVertexArray(mesh.vao_);
-	glDrawArrays(mesh.primitive_type_, 0, mesh.num_vertices_);
-	glBindVertexArray(0);
+	gl::BindVertexArray(mesh.vao_);
+	gl::DrawArrays(mesh.primitive_type_, 0, mesh.num_vertices_);
+	gl::BindVertexArray(0);
 
-	glUseProgram(0);
+	gl::UseProgram(0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
 void App::render_on_cube(const GL::Texture& texture, int width, int height, GLuint framebuffer) {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+	gl::Viewport(0, 0, width, height);
 
 	// Camera.
 	Camera camera;
@@ -208,42 +212,42 @@ void App::render_on_cube(const GL::Texture& texture, int width, int height, GLui
 	GLuint model_to_clip_uniform, normal_to_world_uniform;
 	GLuint texture_flag_uniform, texture_sampler_uniform;
 
-	model_to_clip_uniform				= glGetUniformLocation(mesh_shader_, "uModelToClip");
-	normal_to_world_uniform				= glGetUniformLocation(mesh_shader_, "uNormalToWorld");
-	texture_flag_uniform				= glGetUniformLocation(mesh_shader_, "uTextureFlag");
-	texture_sampler_uniform				= glGetUniformLocation(mesh_shader_, "uTextureSampler");
+	model_to_clip_uniform				= gl::GetUniformLocation(mesh_shader_, "uModelToClip");
+	normal_to_world_uniform				= gl::GetUniformLocation(mesh_shader_, "uNormalToWorld");
+	texture_flag_uniform				= gl::GetUniformLocation(mesh_shader_, "uTextureFlag");
+	texture_sampler_uniform				= gl::GetUniformLocation(mesh_shader_, "uTextureSampler");
 
 	// Set the uniforms and draw.
-	glUseProgram(mesh_shader_);
+	gl::UseProgram(mesh_shader_);
 
-	glUniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
-	glUniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
-	glUniform1i(texture_sampler_uniform, 1);
+	gl::UniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
+	gl::UniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
+	gl::Uniform1i(texture_sampler_uniform, 1);
 
-	glUniform1i(texture_flag_uniform, GL_TRUE);
-	GLint old_active; glGetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
-	glActiveTexture(GL_TEXTURE1);
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	gl::Uniform1i(texture_flag_uniform, GL_TRUE);
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE1);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
 
-	glBindVertexArray(cube_.vao_);
-	glDrawArrays(cube_.primitive_type_, 0, cube_.num_vertices_);
-	glBindVertexArray(0);
+	gl::BindVertexArray(cube_.vao_);
+	gl::DrawArrays(cube_.primitive_type_, 0, cube_.num_vertices_);
+	gl::BindVertexArray(0);
 
-	glBindTexture(GL_TEXTURE_2D, old_tex);
-	glActiveTexture(old_active);
-	glUniform1i(texture_flag_uniform, GL_FALSE);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
+	gl::ActiveTexture(old_active);
+	gl::Uniform1i(texture_flag_uniform, GL_FALSE);
 
-	glUseProgram(0);
+	gl::UseProgram(0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
 void App::render_on_torus(const GL::Texture& texture, int width, int height, GLuint framebuffer) {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+	gl::Viewport(0, 0, width, height);
 
 	// Camera.
 	Camera camera;
@@ -261,37 +265,38 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 	GLuint model_to_clip_uniform, normal_to_world_uniform;
 	GLuint texture_flag_uniform, texture_sampler_uniform;
 
-	model_to_clip_uniform				= glGetUniformLocation(mesh_shader_, "uModelToClip");
-	normal_to_world_uniform				= glGetUniformLocation(mesh_shader_, "uNormalToWorld");
-	texture_flag_uniform				= glGetUniformLocation(mesh_shader_, "uTextureFlag");
-	texture_sampler_uniform				= glGetUniformLocation(mesh_shader_, "uTextureSampler");
+	model_to_clip_uniform				= gl::GetUniformLocation(mesh_shader_, "uModelToClip");
+	normal_to_world_uniform				= gl::GetUniformLocation(mesh_shader_, "uNormalToWorld");
+	texture_flag_uniform				= gl::GetUniformLocation(mesh_shader_, "uTextureFlag");
+	texture_sampler_uniform				= gl::GetUniformLocation(mesh_shader_, "uTextureSampler");
 
 	// Set the uniforms and draw.
-	glUseProgram(mesh_shader_);
+	gl::UseProgram(mesh_shader_);
 
-	glUniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
-	glUniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
-	glUniform1i(texture_sampler_uniform, 1);
+	gl::UniformMatrix4fv(model_to_clip_uniform, 1, GL_FALSE, model_to_clip.data());
+	gl::UniformMatrix3fv(normal_to_world_uniform, 1, GL_FALSE, normal_to_world.data());
+	gl::Uniform1i(texture_sampler_uniform, 1);
 
-	glUniform1i(texture_flag_uniform, GL_TRUE);
-	GLint old_active; glGetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
-	glActiveTexture(GL_TEXTURE1);
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	gl::Uniform1i(texture_flag_uniform, GL_TRUE);
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE1);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
 
-	glBindVertexArray(torus_.vao_);
-	glDrawArrays(torus_.primitive_type_, 0, torus_.num_vertices_);
-	glBindVertexArray(0);
+	gl::BindVertexArray(torus_.vao_);
+	gl::DrawArrays(torus_.primitive_type_, 0, torus_.num_vertices_);
+	gl::BindVertexArray(0);
 
-	glBindTexture(GL_TEXTURE_2D, old_tex);
-	glActiveTexture(old_active);
-	glUniform1i(texture_flag_uniform, GL_FALSE);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
+	gl::ActiveTexture(old_active);
+	gl::Uniform1i(texture_flag_uniform, GL_FALSE);
 
-	glUseProgram(0);
+	gl::UseProgram(0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
-*/
+
+/*
 void App::handleEvents(void) {
     sf::Event event;
     while (window_.pollEvent(event)) {
@@ -303,7 +308,7 @@ void App::handleEvents(void) {
         else if (event.type == sf::Event::Resized)
         {
             // adjust the viewport when the window is resized
-            glViewport(0, 0, event.size.width, event.size.height);
+            gl::Viewport(0, 0, event.size.width, event.size.height);
         }
         else if (event.type == sf::Event::KeyPressed) {
             switch (event.key.code) {
@@ -316,5 +321,6 @@ void App::handleEvents(void) {
         }
     }
 }
+*/
 
 //--------------------

@@ -9,15 +9,15 @@
 void GL::tex_to_png(const GL::Texture& texture, const char* filename) {
 	assert(filename != nullptr);
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
 
 	int width = 0, height = 0;
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+	gl::GetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+	gl::GetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
 
 	auto image_data = std::vector<unsigned char>(width * height * 4);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image_data[0]);
+	gl::GetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image_data[0]);
 
 	// Lode's system is upside down.
 	auto lode_data = std::vector<unsigned char>();
@@ -31,5 +31,5 @@ void GL::tex_to_png(const GL::Texture& texture, const char* filename) {
 	lodepng::encode(image, lode_data, width, height);
 	lodepng::save_file(image, filename);
 
-	glBindTexture(GL_TEXTURE_2D, old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
 }

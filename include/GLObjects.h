@@ -1,7 +1,7 @@
 #ifndef GLOBJECTS_H
 #define GLOBJECTS_H
 
-#include <GL/glew.h>
+#include "gl_api.hpp"
 #include <string>
 #define GL_SHADER_SOURCE(CODE) #CODE
 

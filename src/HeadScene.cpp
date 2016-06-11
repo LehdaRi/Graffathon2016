@@ -100,10 +100,10 @@ void HeadScene::render_head(const Eigen::Matrix4f& M,
 							bool normals_from_texture, bool env_mapped,
 							int width, int height, GLuint framebuffer)
 {
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glViewport(0, 0, width, height);
+	gl::Viewport(0, 0, width, height);
 
 	// Model to view for vertices & normals.
 	Eigen::Matrix4f model_to_view = V * M;
@@ -116,22 +116,22 @@ void HeadScene::render_head(const Eigen::Matrix4f& M,
 	Eigen::Matrix4f view_to_world = V.inverse();
 
 	// Uniforms.
-	glUseProgram(head_shader_);
-	glUniformMatrix4fv(head_uniforms_.model_to_clip, 1, GL_FALSE, model_to_clip.data());
-	glUniformMatrix4fv(head_uniforms_.model_to_view, 1, GL_FALSE, model_to_view.data());
-	glUniform1i(head_uniforms_.normals_from_texture, normals_from_texture);
-	glUniform1i(head_uniforms_.use_env, env_mapped);
-	glUniformMatrix3fv(head_uniforms_.normal_model_to_view, 1, GL_FALSE, normal_model_to_view.data());
-	glUniformMatrix4fv(head_uniforms_.view_to_world, 1, GL_FALSE, view_to_world.data());
+	gl::UseProgram(head_shader_);
+	gl::UniformMatrix4fv(head_uniforms_.model_to_clip, 1, GL_FALSE, model_to_clip.data());
+	gl::UniformMatrix4fv(head_uniforms_.model_to_view, 1, GL_FALSE, model_to_view.data());
+	gl::Uniform1i(head_uniforms_.normals_from_texture, normals_from_texture);
+	gl::Uniform1i(head_uniforms_.use_env, env_mapped);
+	gl::UniformMatrix3fv(head_uniforms_.normal_model_to_view, 1, GL_FALSE, normal_model_to_view.data());
+	gl::UniformMatrix4fv(head_uniforms_.view_to_world, 1, GL_FALSE, view_to_world.data());
 
 	// Draw!
-	glBindVertexArray(head_.vao_);
-	glDrawArrays(head_.primitive_type_, 0, head_.num_vertices_);
+	gl::BindVertexArray(head_.vao_);
+	gl::DrawArrays(head_.primitive_type_, 0, head_.num_vertices_);
 
 	// Clean up.
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindVertexArray(0);
+	gl::UseProgram(0);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
 
 void HeadScene::set_light_config(const Eigen::Matrix4f& V) {
@@ -185,22 +185,22 @@ void HeadScene::set_light_config(const Eigen::Matrix4f& V) {
 		point_view[i] = (V * v4).head<3>();
 	}
 
-	glBindBuffer(GL_ARRAY_BUFFER, dir_light_buffer_);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(dir_view), dir_view, GL_STATIC_DRAW);
+	gl::BindBuffer(GL_ARRAY_BUFFER, dir_light_buffer_);
+	gl::BufferData(GL_ARRAY_BUFFER, sizeof(dir_view), dir_view, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, point_light_buffer_);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(point_view), point_view, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	gl::BindBuffer(GL_ARRAY_BUFFER, point_light_buffer_);
+	gl::BufferData(GL_ARRAY_BUFFER, sizeof(point_view), point_view, GL_STATIC_DRAW);
+	gl::BindBuffer(GL_ARRAY_BUFFER, 0);
 
 	dir_light_texture_ = GL::Texture::buffer_texture(dir_light_buffer_, GL_RGB32F);
 	point_light_texture_ = GL::Texture::buffer_texture(point_light_buffer_, GL_RGB32F);
 
-	GLint old_active; glGetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_BUFFER, dir_light_texture_);
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_BUFFER, point_light_texture_);
-	glActiveTexture(old_active);
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE3);
+	gl::BindTexture(GL_TEXTURE_BUFFER, dir_light_texture_);
+	gl::ActiveTexture(GL_TEXTURE4);
+	gl::BindTexture(GL_TEXTURE_BUFFER, point_light_texture_);
+	gl::ActiveTexture(old_active);
 }
 
 void HeadScene::create_env_map_ring(int n,
@@ -229,15 +229,15 @@ void HeadScene::create_env_map_ring(int n,
 		Eigen::Vector3f(0, -1, 0), Eigen::Vector3f(0, -1, 0)
 	};
 
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cube_depth, 0);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cube_depth, 0);
 
 	for (int i = 0; i < 6; ++i) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+		gl::FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 							   GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, head_env_map_, 0);
 
-		glViewport(0, 0, resolution, resolution);
+		gl::Viewport(0, 0, resolution, resolution);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer);
 
 		Eigen::Vector3f target = position + targets[i];
@@ -248,12 +248,12 @@ void HeadScene::create_env_map_ring(int n,
 		render_head_ring(n, V, P, true, false, resolution, resolution, framebuffer);
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 
-	GLint old_active; glGetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, head_env_map_);
-	glActiveTexture(old_active);
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE2);
+	gl::BindTexture(GL_TEXTURE_CUBE_MAP, head_env_map_);
+	gl::ActiveTexture(old_active);
 }
 
 void HeadScene::render_head_ring(int n,

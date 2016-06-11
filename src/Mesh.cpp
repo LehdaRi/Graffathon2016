@@ -38,34 +38,34 @@ Mesh& Mesh::operator=(Mesh&& other) {
 }
 
 void Mesh::update_buffers(void) {
-        glBindVertexArray(vao_);
+        gl::BindVertexArray(vao_);
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
+        gl::DisableVertexAttribArray(0);
+        gl::DisableVertexAttribArray(1);
+        gl::DisableVertexAttribArray(2);
 
         if (!positions_.empty()) {
-                glBindBuffer(GL_ARRAY_BUFFER, position_buffer_);
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
-                glEnableVertexAttribArray(0);
-                glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * positions_.size(), positions_[0].data(), GL_STATIC_DRAW);
+                gl::BindBuffer(GL_ARRAY_BUFFER, position_buffer_);
+                gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
+                gl::EnableVertexAttribArray(0);
+                gl::BufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * positions_.size(), positions_[0].data(), GL_STATIC_DRAW);
 
                 if (normals_.size() == positions_.size()) {
-                        glBindBuffer(GL_ARRAY_BUFFER, normal_buffer_);
-                        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
-                        glEnableVertexAttribArray(1);
-                        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * normals_.size(), normals_[0].data(), GL_STATIC_DRAW);
+                        gl::BindBuffer(GL_ARRAY_BUFFER, normal_buffer_);
+                        gl::VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
+                        gl::EnableVertexAttribArray(1);
+                        gl::BufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * normals_.size(), normals_[0].data(), GL_STATIC_DRAW);
                 }
                 if (texcoords_.size() == positions_.size()) {
-                        glBindBuffer(GL_ARRAY_BUFFER, texcoord_buffer_);
-                        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), (GLvoid*)0);
-                        glEnableVertexAttribArray(2);
-                        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector2f) * texcoords_.size(), texcoords_[0].data(), GL_STATIC_DRAW);
+                        gl::BindBuffer(GL_ARRAY_BUFFER, texcoord_buffer_);
+                        gl::VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), (GLvoid*)0);
+                        gl::EnableVertexAttribArray(2);
+                        gl::BufferData(GL_ARRAY_BUFFER, sizeof(Vector2f) * texcoords_.size(), texcoords_[0].data(), GL_STATIC_DRAW);
                 }
         }
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        gl::BindBuffer(GL_ARRAY_BUFFER, 0);
+        gl::BindVertexArray(0);
 
         num_vertices_ = positions_.size();
 }
@@ -287,29 +287,29 @@ Mesh Mesh::cube(void) {
         }
 
         // Store in the VAO all the info necessary for drawing sequential vertices.
-        glBindVertexArray(mesh.vao_);
+        gl::BindVertexArray(mesh.vao_);
 
         // Bind the VBO to store the cube's vertices.
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.position_buffer_);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * position_buffer_data.size(), position_buffer_data[0].data(), GL_STATIC_DRAW);
+        gl::BindBuffer(GL_ARRAY_BUFFER, mesh.position_buffer_);
+        gl::VertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
+        gl::BufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * position_buffer_data.size(), position_buffer_data[0].data(), GL_STATIC_DRAW);
 
         // Bind the VBO to store the cube's normals.
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.normal_buffer_);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * normal_buffer_data.size(), normal_buffer_data[0].data(), GL_STATIC_DRAW);
+        gl::BindBuffer(GL_ARRAY_BUFFER, mesh.normal_buffer_);
+        gl::VertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3f), (GLvoid*)0);
+        gl::BufferData(GL_ARRAY_BUFFER, sizeof(Vector3f) * normal_buffer_data.size(), normal_buffer_data[0].data(), GL_STATIC_DRAW);
 
         // Bind the VBO to store the cube's texcoords.
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.texcoord_buffer_);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), (GLvoid*)0);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords[0].data(), GL_STATIC_DRAW);
+        gl::BindBuffer(GL_ARRAY_BUFFER, mesh.texcoord_buffer_);
+        gl::VertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vector2f), (GLvoid*)0);
+        gl::BufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords[0].data(), GL_STATIC_DRAW);
 
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
+        gl::EnableVertexAttribArray(0);
+        gl::EnableVertexAttribArray(1);
+        gl::EnableVertexAttribArray(2);
 
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gl::BindVertexArray(0);
+        gl::BindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Set the rest of the info necessary for drawing the cube.
         mesh.num_vertices_ = size;

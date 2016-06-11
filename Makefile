@@ -9,7 +9,7 @@ DEPDIR   := dep
 CXX      := g++
 # CPPFLAGS := -DGLEW_STATIC
 CXXFLAGS := -g -O0 -Wall -Wextra -Wshadow -pedantic
-LDLIBS   := -lGL -lGLEW -lsfml-system -lsfml-window
+LDLIBS   := -lGL -lglfw
 INCL     := -Iinclude
 
 # These should not be modified.

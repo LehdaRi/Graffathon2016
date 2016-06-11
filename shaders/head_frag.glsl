@@ -1,4 +1,4 @@
-#version 420
+#version 330 core
 
 uniform mat3 uNormalModelToView;
 uniform mat4 uViewToWorld;

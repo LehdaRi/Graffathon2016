@@ -16,24 +16,24 @@ namespace GL
 {
 // Buffer
 Buffer::Buffer(void) {
-	glGenBuffers(1, &buffer_);
+	gl::GenBuffers(1, &buffer_);
 }
 
 Buffer::Buffer(const Buffer& other) {
-	glGenBuffers(1, &buffer_);
+	gl::GenBuffers(1, &buffer_);
 
-	glBindBuffer(GL_COPY_READ_BUFFER, other.buffer_);
-	glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_);
+	gl::BindBuffer(GL_COPY_READ_BUFFER, other.buffer_);
+	gl::BindBuffer(GL_COPY_WRITE_BUFFER, buffer_);
 
 	GLint size, usage;
-	glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
-	glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_USAGE, &usage);
+	gl::GetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &size);
+	gl::GetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_USAGE, &usage);
 
-	glBufferData(GL_COPY_WRITE_BUFFER, size, nullptr, usage);
-	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
+	gl::BufferData(GL_COPY_WRITE_BUFFER, size, nullptr, usage);
+	gl::CopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
 
-	glBindBuffer(GL_COPY_READ_BUFFER, 0);
-	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+	gl::BindBuffer(GL_COPY_READ_BUFFER, 0);
+	gl::BindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
 
 Buffer::Buffer(Buffer&& other) :
@@ -43,30 +43,30 @@ Buffer::Buffer(Buffer&& other) :
 }
 
 Buffer::~Buffer(void) {
-	glDeleteBuffers(1, &buffer_);
+	gl::DeleteBuffers(1, &buffer_);
 }
 
 Buffer& Buffer::operator=(const Buffer& other) {
 	if (this != &other) {
-		glBindBuffer(GL_COPY_READ_BUFFER, other.buffer_);
-		glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_);
+		gl::BindBuffer(GL_COPY_READ_BUFFER, other.buffer_);
+		gl::BindBuffer(GL_COPY_WRITE_BUFFER, buffer_);
 
 		GLint read_size, write_size, read_usage, write_usage;
-		glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &read_size);
-		glGetBufferParameteriv(GL_COPY_WRITE_BUFFER, GL_BUFFER_SIZE, &write_size);
-		glGetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_USAGE, &read_usage);
-		glGetBufferParameteriv(GL_COPY_WRITE_BUFFER, GL_BUFFER_USAGE, &write_usage);
+		gl::GetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_SIZE, &read_size);
+		gl::GetBufferParameteriv(GL_COPY_WRITE_BUFFER, GL_BUFFER_SIZE, &write_size);
+		gl::GetBufferParameteriv(GL_COPY_READ_BUFFER, GL_BUFFER_USAGE, &read_usage);
+		gl::GetBufferParameteriv(GL_COPY_WRITE_BUFFER, GL_BUFFER_USAGE, &write_usage);
 
 		if (read_size == write_size && read_usage == write_usage) {
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, read_size);
+			gl::CopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, read_size);
 		}
 		else {
-			glBufferData(GL_COPY_WRITE_BUFFER, read_size, nullptr, read_usage);
-			glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, read_size);
+			gl::BufferData(GL_COPY_WRITE_BUFFER, read_size, nullptr, read_usage);
+			gl::CopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, read_size);
 		}
 
-		glBindBuffer(GL_COPY_READ_BUFFER, 0);
-		glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+		gl::BindBuffer(GL_COPY_READ_BUFFER, 0);
+		gl::BindBuffer(GL_COPY_WRITE_BUFFER, 0);
 	}
 
 	return *this;
@@ -74,7 +74,7 @@ Buffer& Buffer::operator=(const Buffer& other) {
 
 Buffer& Buffer::operator=(Buffer&& other) {
 	if (this != &other) {
-		glDeleteBuffers(1, &buffer_);
+		gl::DeleteBuffers(1, &buffer_);
 		buffer_ = other.buffer_;
 		other.buffer_ = 0;
 	}
@@ -84,7 +84,7 @@ Buffer& Buffer::operator=(Buffer&& other) {
 
 // Texture
 Texture::Texture(void) {
-	glGenTextures(1, &texture_);
+	gl::GenTextures(1, &texture_);
 }
 
 Texture::Texture(Texture&& other) :
@@ -98,12 +98,12 @@ Texture::Texture(Texture&& other) :
 }
 
 Texture::~Texture(void) {
-	glDeleteTextures(1, &texture_);
+	gl::DeleteTextures(1, &texture_);
 }
 
 Texture& Texture::operator=(Texture&& other) {
 	if (this != &other) {
-		glDeleteTextures(1, &texture_);
+		gl::DeleteTextures(1, &texture_);
 		texture_ = other.texture_;
 		other.texture_ = 0;
 
@@ -131,14 +131,14 @@ Texture Texture::from_png(const char* filename) { // TODO: Error handling & filt
 
 	Texture texture;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
+	gl::TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, old_tex);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	gl::GenerateMipmap(GL_TEXTURE_2D);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
 
 	texture.width_ = width;
 	texture.height_ = height;
@@ -149,12 +149,12 @@ Texture Texture::from_png(const char* filename) { // TODO: Error handling & filt
 Texture Texture::empty_2D(int width, int height) {
 	Texture texture;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, old_tex);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, texture);
+	gl::TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
 
 	texture.width_ = width;
 	texture.height_ = height;
@@ -165,14 +165,14 @@ Texture Texture::empty_2D(int width, int height) {
 Texture Texture::empty_2D_depth(int width, int height) {
 	Texture depth;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
-	glBindTexture(GL_TEXTURE_2D, depth);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, depth);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	gl::TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	gl::TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glBindTexture(GL_TEXTURE_2D, old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
 
 	depth.width_ = width;
 	depth.height_ = height;
@@ -183,21 +183,21 @@ Texture Texture::empty_2D_depth(int width, int height) {
 Texture Texture::empty_cube(int resolution) {
 	Texture texture;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &old_tex);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &old_tex);
+	gl::BindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
 	for (int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
+		gl::TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
 		             resolution, resolution, 0,
 		             GL_RGBA, GL_FLOAT, 0);
 	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, old_tex);
+	gl::BindTexture(GL_TEXTURE_CUBE_MAP, old_tex);
 
 	texture.width_ = texture.height_ = resolution;
 
@@ -207,21 +207,21 @@ Texture Texture::empty_cube(int resolution) {
 Texture Texture::empty_cube_depth(int resolution) {
 	Texture depth;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &old_tex);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, depth);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_CUBE_MAP, &old_tex);
+	gl::BindTexture(GL_TEXTURE_CUBE_MAP, depth);
 
 	for (int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24,
+		gl::TexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT24,
 		             resolution, resolution, 0,
 		             GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	gl::TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glBindTexture(GL_TEXTURE_CUBE_MAP, old_tex);
+	gl::BindTexture(GL_TEXTURE_CUBE_MAP, old_tex);
 
 	depth.width_ = depth.height_ = resolution;
 
@@ -231,10 +231,10 @@ Texture Texture::empty_cube_depth(int resolution) {
 Texture Texture::buffer_texture(const Buffer& buffer, GLenum format) {
 	Texture texture;
 
-	GLint old_tex; glGetIntegerv(GL_TEXTURE_BINDING_BUFFER, &old_tex);
-	glBindTexture(GL_TEXTURE_BUFFER, texture);
-	glTexBuffer(GL_TEXTURE_BUFFER, format, buffer);
-	glBindTexture(GL_TEXTURE_BUFFER, old_tex);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_BUFFER, &old_tex);
+	gl::BindTexture(GL_TEXTURE_BUFFER, texture);
+	gl::TexBuffer(GL_TEXTURE_BUFFER, format, buffer);
+	gl::BindTexture(GL_TEXTURE_BUFFER, old_tex);
 
 	texture.width_ = INT_MAX; // TODO: Fix this.
 	texture.height_ = 1;
@@ -244,7 +244,7 @@ Texture Texture::buffer_texture(const Buffer& buffer, GLenum format) {
 
 // VAO
 VAO::VAO(void) {
-	glGenVertexArrays(1, &vao_);
+	gl::GenVertexArrays(1, &vao_);
 }
 
 VAO::VAO(VAO&& other) :
@@ -254,12 +254,12 @@ VAO::VAO(VAO&& other) :
 }
 
 VAO::~VAO(void) {
-	glDeleteVertexArrays(1, &vao_);
+	gl::DeleteVertexArrays(1, &vao_);
 }
 
 VAO& VAO::operator=(VAO&& other) {
 	if (this != &other) {
-		glDeleteVertexArrays(1, &vao_);
+		gl::DeleteVertexArrays(1, &vao_);
 		vao_ = other.vao_;
 		other.vao_ = 0;
 	}
@@ -269,7 +269,7 @@ VAO& VAO::operator=(VAO&& other) {
 
 // FBO
 FBO::FBO(void) {
-	glGenFramebuffers(1, &fbo_);
+	gl::GenFramebuffers(1, &fbo_);
 }
 
 FBO::FBO(FBO&& other) :
@@ -279,12 +279,12 @@ FBO::FBO(FBO&& other) :
 }
 
 FBO::~FBO(void) {
-	glDeleteFramebuffers(1, &fbo_);
+	gl::DeleteFramebuffers(1, &fbo_);
 }
 
 FBO& FBO::operator=(FBO&& other) {
 	if (this != &other) {
-		glDeleteFramebuffers(1, &fbo_);
+		gl::DeleteFramebuffers(1, &fbo_);
 		fbo_ = other.fbo_;
 		other.fbo_ = 0;
 	}
@@ -295,24 +295,24 @@ FBO& FBO::operator=(FBO&& other) {
 FBO FBO::simple_C0(const Texture& color) {
 	FBO framebuffer;
 
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glClearColor(0, 0, 0, 1);
+	gl::ClearColor(0, 0, 0, 1);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color, 0);
+	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color, 0);
 
 	const GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, &draw_buffer);
+	gl::DrawBuffers(1, &draw_buffer);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	GLenum status = gl::CheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+		gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 		std::cerr << "Framebuffer incomplete." << std::endl;
 		throw std::runtime_error("Framebuffer incomplete.");
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 
 	return framebuffer;
 }
@@ -320,49 +320,49 @@ FBO FBO::simple_C0(const Texture& color) {
 FBO FBO::simple_C0D(const Texture& color, const Texture& depth) {
 	FBO framebuffer;
 
-	GLint old_fbo; glGetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0, 0, 0, 1);
+	gl::Enable(GL_DEPTH_TEST);
+	gl::ClearColor(0, 0, 0, 1);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color, 0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
+	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color, 0);
+	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
 
 	const GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, &draw_buffer);
+	gl::DrawBuffers(1, &draw_buffer);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	GLenum status = gl::CheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+		gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 		std::cerr << "Framebuffer incomplete." << std::endl;
 		throw std::runtime_error("Framebuffer incomplete.");
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 
 	return framebuffer;
 }
 
 // ShaderObject
 ShaderObject::ShaderObject(GLenum shader_type) {
-	shader_object_ = glCreateShader(shader_type);
+	shader_object_ = gl::CreateShader(shader_type);
 }
 
 ShaderObject::ShaderObject(GLenum shader_type, const char* shader_source) {
-	shader_object_ = glCreateShader(shader_type);
-	glShaderSource(shader_object_, 1, &shader_source, NULL);
+	shader_object_ = gl::CreateShader(shader_type);
+	gl::ShaderSource(shader_object_, 1, &shader_source, NULL);
 
-	glCompileShader(shader_object_);
+	gl::CompileShader(shader_object_);
 
 	// Check errors.
 	GLint compile_status;
-	glGetShaderiv(shader_object_, GL_COMPILE_STATUS, &compile_status);
+	gl::GetShaderiv(shader_object_, GL_COMPILE_STATUS, &compile_status);
 	if (compile_status == GL_FALSE) {
 		GLint info_log_length;
-		glGetShaderiv(shader_object_, GL_INFO_LOG_LENGTH, &info_log_length);
+		gl::GetShaderiv(shader_object_, GL_INFO_LOG_LENGTH, &info_log_length);
 		std::vector<GLchar> info_log_vector(info_log_length + 1);
-		glGetShaderInfoLog(shader_object_, info_log_length, NULL, &info_log_vector[0]);
+		gl::GetShaderInfoLog(shader_object_, info_log_length, NULL, &info_log_vector[0]);
 
 		std::string type_string;
 		switch (shader_type) {
@@ -384,7 +384,7 @@ ShaderObject::ShaderObject(GLenum shader_type, const char* shader_source) {
 
 		std::cerr << type_string << "compilation failed. Info log:" << std::endl << &info_log_vector[0];
 
-		glDeleteShader(shader_object_);
+		gl::DeleteShader(shader_object_);
 		throw std::runtime_error(type_string + "compilation failed.");
 	}
 }
@@ -396,12 +396,12 @@ ShaderObject::ShaderObject(ShaderObject&& other) :
 }
 
 ShaderObject::~ShaderObject(void) {
-	glDeleteShader(shader_object_);
+	gl::DeleteShader(shader_object_);
 }
 
 ShaderObject& ShaderObject::operator=(ShaderObject&& other) {
 	if (this != &other) {
-		glDeleteShader(shader_object_);
+		gl::DeleteShader(shader_object_);
 		shader_object_ = other.shader_object_;
 		other.shader_object_ = 0;
 	}
@@ -431,14 +431,14 @@ ShaderObject ShaderObject::vertex_passthrough(void) {
 
 // ShaderProgram
 ShaderProgram::ShaderProgram(void) {
-	shader_program_ = glCreateProgram();
+	shader_program_ = gl::CreateProgram();
 }
 
 ShaderProgram::ShaderProgram(const ShaderObject& vertex_shader, const ShaderObject& fragment_shader) {
-	shader_program_ = glCreateProgram();
+	shader_program_ = gl::CreateProgram();
 
-	glAttachShader(shader_program_, vertex_shader);
-	glAttachShader(shader_program_, fragment_shader);
+	gl::AttachShader(shader_program_, vertex_shader);
+	gl::AttachShader(shader_program_, fragment_shader);
 
 	if (!link()) {
 		std::cerr << "Shader program linking failed. Info log:" << std::endl << get_info_log();
@@ -458,12 +458,12 @@ ShaderProgram::ShaderProgram(ShaderProgram&& other) :
 }
 
 ShaderProgram::~ShaderProgram(void) {
-	glDeleteProgram(shader_program_);
+	gl::DeleteProgram(shader_program_);
 }
 
 ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) {
 	if (this != &other) {
-		glDeleteProgram(shader_program_);
+		gl::DeleteProgram(shader_program_);
 		shader_program_ = other.shader_program_;
 		other.shader_program_ = 0;
 	}
@@ -472,10 +472,10 @@ ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other) {
 }
 
 GLint ShaderProgram::link(void) {
-	glLinkProgram(shader_program_);
+	gl::LinkProgram(shader_program_);
 
 	GLint link_status;
-	glGetProgramiv(shader_program_, GL_LINK_STATUS, &link_status);
+	gl::GetProgramiv(shader_program_, GL_LINK_STATUS, &link_status);
 
 	return link_status;
 }
@@ -483,9 +483,9 @@ GLint ShaderProgram::link(void) {
 std::string ShaderProgram::get_info_log(void) {
 	GLint info_log_length;
 
-	glGetProgramiv(shader_program_, GL_INFO_LOG_LENGTH, &info_log_length);
+	gl::GetProgramiv(shader_program_, GL_INFO_LOG_LENGTH, &info_log_length);
 	std::vector<GLchar> info_log_vector(info_log_length + 1);
-	glGetProgramInfoLog(shader_program_, info_log_length, NULL, &info_log_vector[0]);
+	gl::GetProgramInfoLog(shader_program_, info_log_length, NULL, &info_log_vector[0]);
 
 	return &info_log_vector[0];
 }
@@ -500,78 +500,78 @@ ShaderProgram ShaderProgram::from_files(const char* vertex_file, const char* fra
 
 /*ShaderProgram::ShaderProgram(const char* vertex_source, const char* fragment_source) {
         // Create the vertex shader.
-        GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex_shader, 1, &vertex_source, NULL);
+        GLuint vertex_shader = gl::CreateShader(GL_VERTEX_SHADER);
+        gl::ShaderSource(vertex_shader, 1, &vertex_source, NULL);
 
-        glCompileShader(vertex_shader);
+        gl::CompileShader(vertex_shader);
 
         // Check errors.
         GLint compile_status;
-        glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &compile_status);
+        gl::GetShaderiv(vertex_shader, GL_COMPILE_STATUS, &compile_status);
         if (compile_status == GL_FALSE) {
                 GLint info_log_length;
-                glGetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &info_log_length);
+                gl::GetShaderiv(vertex_shader, GL_INFO_LOG_LENGTH, &info_log_length);
                 std::vector<GLchar> info_log_vector(info_log_length + 1);
-                glGetShaderInfoLog(vertex_shader, info_log_length, NULL, &info_log_vector[0]);
+                gl::GetShaderInfoLog(vertex_shader, info_log_length, NULL, &info_log_vector[0]);
 
                 std::cerr << "Vertex shader compilation failed. Info log:" << std::endl << &info_log_vector[0];
 
-                glDeleteShader(vertex_shader);
+                gl::DeleteShader(vertex_shader);
                 throw std::runtime_error("Vertex shader compilation failed.");
         }
 
         // Create the fragment shader.
-        GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment_shader, 1, &fragment_source, NULL);
+        GLuint fragment_shader = gl::CreateShader(GL_FRAGMENT_SHADER);
+        gl::ShaderSource(fragment_shader, 1, &fragment_source, NULL);
 
-        glCompileShader(fragment_shader);
+        gl::CompileShader(fragment_shader);
 
         // Check errors.
-        glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &compile_status);
+        gl::GetShaderiv(fragment_shader, GL_COMPILE_STATUS, &compile_status);
         if (compile_status == GL_FALSE) {
                 GLint info_log_length;
-                glGetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &info_log_length);
+                gl::GetShaderiv(fragment_shader, GL_INFO_LOG_LENGTH, &info_log_length);
                 std::vector<GLchar> info_log_vector(info_log_length + 1);
-                glGetShaderInfoLog(fragment_shader, info_log_length, NULL, &info_log_vector[0]);
+                gl::GetShaderInfoLog(fragment_shader, info_log_length, NULL, &info_log_vector[0]);
 
                 std::cerr << "Fragment shader compilation failed. Info log:" << std::endl << &info_log_vector[0];
 
-                glDeleteShader(vertex_shader);
-                glDeleteShader(fragment_shader);
+                gl::DeleteShader(vertex_shader);
+                gl::DeleteShader(fragment_shader);
                 throw std::runtime_error("Fragment shader compilation failed.");
         }
 
         // Create the shader program.
-        GLuint shader_program = glCreateProgram();
-        glAttachShader(shader_program, vertex_shader);
-        glAttachShader(shader_program, fragment_shader);
+        GLuint shader_program = gl::CreateProgram();
+        gl::AttachShader(shader_program, vertex_shader);
+        gl::AttachShader(shader_program, fragment_shader);
 
-        glLinkProgram(shader_program);
+        gl::LinkProgram(shader_program);
 
         // Check errors.
         GLint link_status;
-        glGetProgramiv(shader_program, GL_LINK_STATUS, &link_status);
+        gl::GetProgramiv(shader_program, GL_LINK_STATUS, &link_status);
         if (link_status == GL_FALSE) {
                 GLint info_log_length;
-                glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &info_log_length);
+                gl::GetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &info_log_length);
                 std::vector<GLchar> info_log_vector(info_log_length + 1);
-                glGetProgramInfoLog(shader_program, info_log_length, NULL, &info_log_vector[0]);
+                gl::GetProgramInfoLog(shader_program, info_log_length, NULL, &info_log_vector[0]);
 
                 std::cerr << "Shader program linking failed. Info log:" << std::endl << &info_log_vector[0];
 
-                glDetachShader(shader_program, vertex_shader);
-                glDetachShader(shader_program, fragment_shader);
-                glDeleteProgram(shader_program);
-                glDeleteShader(fragment_shader);
-                glDeleteShader(vertex_shader);
+                gl::DetachShader(shader_program, vertex_shader);
+                gl::DetachShader(shader_program, fragment_shader);
+                gl::DeleteProgram(shader_program);
+                gl::DeleteShader(fragment_shader);
+                gl::DeleteShader(vertex_shader);
                 throw std::runtime_error("Shader program linking failed.");
         }
 
         // Clean up.
-        glDetachShader(shader_program, vertex_shader);
-        glDetachShader(shader_program, fragment_shader);
-        glDeleteShader(vertex_shader);
-        glDeleteShader(fragment_shader);
+        gl::DetachShader(shader_program, vertex_shader);
+        gl::DetachShader(shader_program, fragment_shader);
+        gl::DeleteShader(vertex_shader);
+        gl::DeleteShader(fragment_shader);
 
         shader_program_ = shader_program;
 }*/

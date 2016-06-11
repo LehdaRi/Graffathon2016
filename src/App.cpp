@@ -12,12 +12,12 @@
 //--------------------
 
 App::App(int argc, char* argv[])
-:	window_					(1024, 768, "HIKISETMIEHET.EXE"),
+:	window_					(1024, 768, "GRAFFAAAAAARGH"),
 	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
 	time_					( (glfwSetTime(0), glfwGetTime()) ),
 
 	root_                   (SCENE.addNode()),
-	mesh_                   (),
+	renderer_               (camera_, 1024, 768, mesh_shader_, framebuffer_),
 
 	head_scene_				(HeadScene::simple()),
 	normals_from_texture_	(true),
@@ -31,8 +31,9 @@ App::App(int argc, char* argv[])
 	depth_ = GL::Texture::empty_2D_depth(width, height);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
-    mesh_.from_obj("res/block_corner_4_4_a.obj");
-    //SCENE.addComponent<MeshComponent>(root_, mesh_);
+    mesh_.from_obj("res/head.obj");
+    //printf("%p\n", &mesh_);   //TEMP
+    SCENE.addComponent<MeshComponent>(root_, &torus_);
 
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
@@ -45,20 +46,22 @@ void App::loop(void) {
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);
 
-		gl::ClearColor(0.35, 0.1, 0.1, 1);
-		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
-		head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
+		//gl::ClearColor(0.35, 0.1, 0.1, 1);
+		//SCENE(renderer_);
+		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+		//head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		render_on_cube(image_, width, height);
+		//SCENE(renderer_);
+		render_mesh(mesh_, 1024, 768);
+		//render_on_cube(image_, width, height);
 
 		glfwSwapBuffers(window_);
-
 		glfwPollEvents();
 	}
 }
-
+/*
 void App::raymarch(int width, int height, GLuint framebuffer) {
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
 	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -150,6 +153,7 @@ void App::render_texture(const GL::Texture& texture, int width, int height, GLui
 
 	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
+*/
 
 void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffer) {
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
@@ -159,7 +163,7 @@ void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffe
 
 	// Camera.
 	Camera camera;
-	Eigen::Vector3f eye = Eigen::Vector3f(2 * std::sin(time_), 2, 2*std::cos(time_));
+	Eigen::Vector3f eye = Eigen::Vector3f(1 * std::sin(time_), 2, 1*std::cos(time_));
 	camera.lookAt(eye);
 	camera.perspective(width, height, PI/2);
 	Eigen::Matrix4f view = camera.getOrientation();
@@ -251,9 +255,9 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 
 	// Camera.
 	Camera camera;
-	Eigen::Vector3f eye					= Eigen::Vector3f(2 * std::sin(time_), 2, 4 * std::cos(time_));
+	Eigen::Vector3f eye					= Eigen::Vector3f(1 * std::sin(time_), 2, 2 * std::cos(time_));
 	camera.lookAt(eye);
-	camera.perspective(width, height, PI/2);
+	camera.perspective(width, height, PI/2, 0.1f, 100.0f);
 	Eigen::Matrix4f view				= camera.getOrientation();
 	Eigen::Matrix4f projection			= camera.getPerspective();
 
@@ -295,32 +299,5 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 
 	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
-
-/*
-void App::handleEvents(void) {
-    sf::Event event;
-    while (window_.pollEvent(event)) {
-        if (event.type == sf::Event::Closed)
-        {
-            // end the program
-            window_.close();
-        }
-        else if (event.type == sf::Event::Resized)
-        {
-            // adjust the viewport when the window is resized
-            gl::Viewport(0, 0, event.size.width, event.size.height);
-        }
-        else if (event.type == sf::Event::KeyPressed) {
-            switch (event.key.code) {
-            case sf::Keyboard::Escape:
-                window_.close();
-            break;
-            default:
-            break;
-            }
-        }
-    }
-}
-*/
 
 //--------------------

@@ -8,10 +8,12 @@
 
 class MeshComponent : public ComponentBase {
 public:
-    MeshComponent(Mesh& mesh);
+    friend class Renderer;
+
+    MeshComponent(Mesh* mesh);
 
 private:
-    Mesh& mesh_;
+    Mesh* mesh_;
 };
 
 

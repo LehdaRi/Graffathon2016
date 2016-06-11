@@ -23,43 +23,6 @@ Matrix4f perspective(int width, int height, float fov, float near, float far) {
 
 //--------------------
 
-Matrix4f look_at(const Vector3f& eye, const Vector3f& target, const Vector3f& up_hint) {
-        Vector3f z = (eye - target).normalized();
-        Vector3f y = (up_hint - up_hint.dot(z) * z).normalized();
-        Vector3f x = y.cross(z).normalized();
-
-        Matrix4f rot;
-        rot << x , y , z , Vector3f::Zero() ,
-               0 , 0 , 0 , 1                ;
-        rot.transposeInPlace();
-
-        Matrix4f trans = Matrix4f::Identity();
-        trans.col(3) << -eye ,
-                         1   ;
-
-        return rot * trans;
-}
-
-//--------------------
-
-Matrix3f ray_look_at(const Vector3f& eye, const Vector3f& target, const Vector3f& up_hint,
-                     int width, int height, float fov) {
-        Vector3f forward = (target - eye).normalized();
-        Vector3f up = (up_hint - up_hint.dot(forward) * forward).normalized();
-        Vector3f right = forward.cross(up);
-
-        float AR = width / (float)height;
-        float r = std::tan(fov / 2);
-        float t = r / AR;
-
-        right *= r;
-        up *= t;
-
-        return (Matrix3f() << forward, right, up).finished();
-}
-
-//--------------------
-
 GL::ShaderProgram supercool_shader(void) {
         return GL::ShaderProgram(
                 "#version 330\n"

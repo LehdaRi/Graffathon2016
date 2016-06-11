@@ -11,18 +11,11 @@
 
 //--------------------
 
-App::App(int argc, char* argv[])
-:	window_					(1024, 768, "GRAFFAAAAAARGH"),
+App::App(int argc, char* argv[], MainWindow& window) :
+    window_					(window),
 	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
 	time_					( (glfwSetTime(0), glfwGetTime()) ),
-
-	root_                   (SCENE.addNode()),
-	renderer_               (camera_, 1024, 768, mesh_shader_, framebuffer_),
-
-	head_scene_				(HeadScene::simple()),
-	normals_from_texture_	(true),
-	cube_					(Mesh::cube()),
-	torus_					(Mesh::torus(2.0f, 0.7f, 6, 6))
+	renderer_               (camera_, 1024, 768, mesh_shader_, framebuffer_)
 {
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
@@ -31,8 +24,11 @@ App::App(int argc, char* argv[])
 	depth_ = GL::Texture::empty_2D_depth(width, height);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
-    mesh_ = Mesh::from_obj("res/block_corner_4_4_a.obj");
-    SCENE.addComponent<MeshComponent>(root_, &mesh_);
+    //  LOAD BLOXXXX
+    //Building::loadBlockMeshes();
+
+    //mesh_ = Mesh::from_obj("res/block_corner_4_4_a.obj");
+    //SCENE.addComponent<MeshComponent>(root_,  &mesh_);
 
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
@@ -45,16 +41,11 @@ void App::loop(void) {
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);
 
-		//gl::ClearColor(0.35, 0.1, 0.1, 1);
-		//SCENE(renderer_);
-		//GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
-		//head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
-
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		SCENE(transVisitor_);
 		SCENE(renderer_);
-		//render_mesh(mesh_, 1024, 768);
-		//render_on_cube(image_, width, height);
 
 		glfwSwapBuffers(window_);
 		glfwPollEvents();
@@ -152,7 +143,6 @@ void App::render_texture(const GL::Texture& texture, int width, int height, GLui
 
 	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
-*/
 
 void App::render_mesh(const Mesh& mesh, int width, int height, GLuint framebuffer) {
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
@@ -298,5 +288,5 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 
 	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
 }
-
+*/
 //--------------------

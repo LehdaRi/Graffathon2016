@@ -6,7 +6,12 @@
 //--------------------
 
 int main(int argc, char* argv[]) {
-    App app(argc, argv);
+    MainWindow mainWindow(1024, 768, "GRAFFAAAAAARGH");
+
+    //  LOAD BLOXXXX
+    Building::loadBlockMeshes();
+
+    App app(argc, argv, mainWindow);
     app.loop();
 
     return 0;

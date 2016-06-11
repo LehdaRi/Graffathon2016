@@ -10,10 +10,11 @@
 class Mesh {
 public:
         Mesh(void) : num_vertices_(0), primitive_type_(GL_TRIANGLES) {}
-        Mesh(const Mesh&) = delete;
-        Mesh(Mesh&&);
+        Mesh(const std::string& objFileName);
 
-        Mesh& operator=(const Mesh&) = delete;
+        Mesh(const Mesh&)               = delete;
+        Mesh(Mesh&&);
+        Mesh& operator=(const Mesh&)    = delete;
         Mesh& operator=(Mesh&&);
 public:
         void update_buffers(void);

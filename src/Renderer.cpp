@@ -2,8 +2,13 @@
 #include "Camera.hpp"
 #include "GLObjects.h"
 #include "GLUtils.h"
+#include "Node.hpp"
+#include "TransformationComponent.hpp"
 
 #include <Eigen/Dense>
+
+
+using namespace Eigen;
 
 
 Renderer::Renderer(Camera& camera, uint32_t width, uint32_t height,
@@ -18,6 +23,9 @@ Renderer::Renderer(Camera& camera, uint32_t width, uint32_t height,
 }
 
 void Renderer::operator()(MeshComponent& component) {
+    auto& tc = component.node_.ref().getComponent<TransformationComponent>();
+    Matrix4f model = tc.mCumulative_;
+
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
 	gl::BindFramebuffer(GL_FRAMEBUFFER, 0);//framebuffer_);
 
@@ -25,14 +33,14 @@ void Renderer::operator()(MeshComponent& component) {
 
 	// Camera.
 	float time_ = 0.0f; //TEMP
-	Eigen::Vector3f eye = Eigen::Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
+	Vector3f eye = Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
 	camera_.lookAt(eye);
-	//Eigen::Matrix4f view = camera.getOrientation();
-	//Eigen::Matrix4f projection = camera.getPerspective();
+	//Matrix4f view = camera.getOrientation();
+	//Matrix4f projection = camera.getPerspective();
 
 	// We'll assume that the mesh is already in world space.
-	Eigen::Matrix4f model_to_clip = camera_.getPerspective() * camera_.getOrientation();
-	Eigen::Matrix3f normal_to_world = Eigen::Matrix3f::Identity();
+	Matrix4f model_to_clip = camera_.getPerspective() * camera_.getOrientation() * model;
+	Matrix3f normal_to_world = Matrix3f::Identity();
 
 	// Get the uniform locations from OpenGL.
 	GLuint model_to_clip_uniform, normal_to_world_uniform;

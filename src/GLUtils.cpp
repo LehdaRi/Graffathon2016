@@ -8,22 +8,7 @@ using namespace Eigen;
 
 namespace GLUtils
 {
-Matrix4f perspective(int width, int height, float fov, float near, float far) {
-        float n = near;                                         float f = far;
-        float AR = width / (float)height;
-        float r = std::tan(fov / 2.0f) * n; float l = -r;
-        float t = r / AR;                                       float b = -t;
-
-        return (Matrix4f() << 2.0f*n/(r-l) , 0.0f         ,  (r+l)/(r-l) ,  0.0f           ,
-                              0.0f         , 2.0f*n/(t-b) ,  (t+b)/(t-b) ,  0.0f           ,
-                              0.0f         , 0.0f         , -(f+n)/(f-n) , -2.0f*f*n/(f-n) ,
-                              0.0f         , 0.0f         , -1.0f        ,  0.0f           ).finished();
-
-}
-
-//--------------------
-
-GL::ShaderProgram supercool_shader(void) {
+    GL::ShaderProgram supercool_shader(void) {
         return GL::ShaderProgram(
                 "#version 330\n"
                 GL_SHADER_SOURCE(
@@ -53,5 +38,5 @@ GL::ShaderProgram supercool_shader(void) {
                         }
                 )
         );
-}
+    }
 } // namespace GLUtils

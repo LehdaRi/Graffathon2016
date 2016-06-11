@@ -28,13 +28,15 @@ private:
 	void     render_mesh        (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
 	void     render_on_cube     (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
 	void     render_on_torus    (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-    void     handleEvents       (void);
+	void     postprocess        (const GL::Texture& input, int width, int height, GLuint framebuffer = 0);
+    //void     handleEvents       (void);
 
 private:
 	// Framework objects.
 	MainWindow         window_;
 	Canvas            canvas_;
 	GL::ShaderProgram mesh_shader_;
+	GL::ShaderProgram postprocess_shader_;
 	GL::ShaderProgram raymarcher_shader_;
 	GL::Texture       image_;
 	GL::Texture       depth_;

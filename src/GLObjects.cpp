@@ -421,7 +421,7 @@ ShaderObject ShaderObject::from_file(GLenum shader_type, const char* source_file
 
 ShaderObject ShaderObject::vertex_passthrough(void) {
 	return ShaderObject(GL_VERTEX_SHADER,
-		"#version 420\n"
+		"#version 330 core\n"
 		GL_SHADER_SOURCE(
 			layout(location = 0) in vec4 aPosition;
 			void main() {gl_Position = aPosition;}

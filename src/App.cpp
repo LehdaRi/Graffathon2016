@@ -9,11 +9,16 @@
 #include <string>
 #include <iostream>
 
+#include <SFML/Audio.hpp>
+
 //--------------------
 
 App::App(int argc, char* argv[])
 :	window_					(1024, 768, "HIKISETMIEHET.EXE"),
 	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
+	postprocess_shader_      (GL::ShaderObject::from_file(GL_VERTEX_SHADER, "shaders/postprocess.vert"),
+	                         GL::ShaderObject::from_file(GL_FRAGMENT_SHADER, "shaders/postprocess.frag")),
+
 	time_					( (glfwSetTime(0), glfwGetTime()) ),
 
 	root_                   (SCENE.addNode()),
@@ -36,6 +41,13 @@ App::App(int argc, char* argv[])
 
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
+
+	/*
+	sf::Music music;
+	if (!music.openFromFile("0xDEADBEEF"))
+	    return -1; // error
+	music.play();
+	*/
 }
 
 void App::loop(void) {
@@ -48,14 +60,31 @@ void App::loop(void) {
 		gl::ClearColor(0.35, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
 		head_scene_.render(time_, normals_from_texture_, width, height, framebuffer_);
+		/*
+		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		head_scene_.render(time_, normals_from_texture_, width, height);
+		*/
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		render_on_cube(image_, width, height);
+
+		postprocess(image_, width, height);
 
 		glfwSwapBuffers(window_);
 
 		glfwPollEvents();
+
+		int state = glfwGetKey(window_, GLFW_KEY_GRAVE_ACCENT);
+		if (state == GLFW_PRESS) {
+			postprocess_shader_ =
+				GL::ShaderProgram(GL::ShaderObject::from_file(GL_VERTEX_SHADER, "shaders/postprocess.vert"),
+				                  GL::ShaderObject::from_file(GL_FRAGMENT_SHADER, "shaders/postprocess.frag"));
+		}
+
+		state = glfwGetKey(window_, GLFW_KEY_ESCAPE);
+		if (state == GLFW_PRESS) {
+			break;
+		}
 	}
 }
 
@@ -290,6 +319,38 @@ void App::render_on_torus(const GL::Texture& texture, int width, int height, GLu
 	gl::BindTexture(GL_TEXTURE_2D, old_tex);
 	gl::ActiveTexture(old_active);
 	gl::Uniform1i(texture_flag_uniform, GL_FALSE);
+
+	gl::UseProgram(0);
+
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+}
+
+void App::postprocess(const GL::Texture& input, int width, int height, GLuint framebuffer) {
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	gl::Viewport(0, 0, width, height);
+
+	auto texture_uniform = gl::GetUniformLocation(postprocess_shader_, "uScreenTexture");
+	auto screen_size_uniform = gl::GetUniformLocation(postprocess_shader_, "uScreenSize");
+	auto time_uniform = gl::GetUniformLocation(postprocess_shader_, "uTime");
+
+	gl::UseProgram(postprocess_shader_);
+	gl::Uniform1i(texture_uniform, 1);
+	gl::Uniform2i(screen_size_uniform, width, height);
+	gl::Uniform1f(time_uniform, time_);
+
+	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
+	gl::ActiveTexture(GL_TEXTURE1);
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D, input);
+
+	gl::BindVertexArray(canvas_.vao_);
+	gl::DrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
+	gl::BindVertexArray(0);
+
+	gl::BindTexture(GL_TEXTURE_2D, old_tex);
+	gl::ActiveTexture(old_active);
 
 	gl::UseProgram(0);
 

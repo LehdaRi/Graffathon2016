@@ -27,7 +27,7 @@ void Renderer::operator()(MeshComponent& component) {
     Matrix4f model = tc.mCumulative_;
 
 	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
-	gl::BindFramebuffer(GL_FRAMEBUFFER, 0);//framebuffer_);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer_);
 
 	gl::Viewport(0, 0, width_, height_);
 

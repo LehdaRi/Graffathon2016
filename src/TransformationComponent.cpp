@@ -23,3 +23,12 @@ void TransformationComponent::translate(const Vector3f& v) {
 
     m_ = tm * m_;
 }
+
+void TransformationComponent::rotateY(float angle) {
+    Matrix4f rm;
+    rm <<   cosf(angle),    0.0f,   sinf(angle),    0.0f,
+            0.0f,           1.0f,   0.0f,           0.0f,
+            -sinf(angle),   0.0f,   cosf(angle),    0.0f,
+            0.0f,           0.0f,   0.0f,           1.0f;
+    m_ = rm * m_;
+}

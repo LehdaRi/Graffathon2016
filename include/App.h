@@ -39,8 +39,7 @@ private:
 	MainWindow&         window_;
 	Canvas              canvas_;
 	Camera              camera_;
-	GL::ShaderProgram   mesh_shader_;
-	GL::ShaderProgram   raymarcher_shader_;
+	GL::ShaderProgram   shader_;
 	GL::Texture         image_;
 	GL::Texture         depth_;
 	GL::FBO             framebuffer_;

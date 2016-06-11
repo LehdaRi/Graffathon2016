@@ -2,9 +2,10 @@
 #include "Scene.hpp"
 #include "MeshComponent.hpp"
 #include "TransformationComponent.hpp"
+#include "GLUtils.h"
 
 
-std::default_random_engine Building::r__(715517);
+std::default_random_engine Building::r__(957463);
 std::unordered_map<uint64_t, std::vector<Mesh>> Building::blocks__;
 
 
@@ -18,7 +19,7 @@ BuildingFloor::BuildingFloor(std::default_random_engine& r, const NodeId& bRoot)
     auto& tc = SCENE.addComponent<TransformationComponent>(root_, bRoot);
     tc.translate(Vector3f(0.0f, 0.0f, 0.0f));
 
-    for (auto i=0u; i<4; ++i) {
+    for (auto i=0u; i<5; ++i) {
         rooms_.push_back(SCENE.addNode(bRoot));
         auto& rn = rooms_.back();
         switch (r()%5) {
@@ -39,7 +40,8 @@ BuildingFloor::BuildingFloor(std::default_random_engine& r, const NodeId& bRoot)
             break;
         }
         auto& tc = SCENE.addComponent<TransformationComponent>(rn, root_);
-        tc.translate(Vector3f((r()%1001)*0.01f-5.0f, 0, (r()%101)*0.001f-5.0f));
+        tc.rotateY((r()%1000)*0.001*2*PI);
+        tc.translate(Vector3f((r()%2001)*0.01f-10.0f, 0, (r()%2001)*0.01f-10.0f));
     }
 }
 
@@ -73,7 +75,7 @@ Building::Building(void) :
     root_   (SCENE.addNode())
 {
     floors_.emplace_back(r__, root_);
-    for (auto i=1; i<15; ++i)
+    for (auto i=1; i<10; ++i)
     floors_.emplace_back(floors_.front(), root_, Vector3f(0.0f, i*2.0f, 0.0f));
 }
 
@@ -95,6 +97,12 @@ void Building::loadBlockMeshes(void) {
     blocks__[makeBlockGroupId(1, 0, 0, 6, 4)].emplace_back("res/block_corner_6_4_b.obj");
     blocks__[makeBlockGroupId(1, 0, 0, 6, 6)].emplace_back("res/block_corner_6_6_a.obj");
     blocks__[makeBlockGroupId(1, 0, 0, 6, 6)].emplace_back("res/block_corner_6_6_b.obj");
+    //  inv. corners
+    blocks__[makeBlockGroupId(1, 4, 4, 4, 4)].emplace_back("res/block_invcorner_4_4_4_4_a.obj");
+    blocks__[makeBlockGroupId(1, 4, 4, 6, 6)].emplace_back("res/block_invcorner_4_4_6_6_a.obj");
+    blocks__[makeBlockGroupId(1, 4, 6, 6, 4)].emplace_back("res/block_invcorner_4_6_6_4_a.obj");
+    blocks__[makeBlockGroupId(1, 6, 6, 4, 4)].emplace_back("res/block_invcorner_6_6_4_4_a.obj");
+    blocks__[makeBlockGroupId(1, 6, 6, 6, 6)].emplace_back("res/block_invcorner_6_6_6_6_a.obj");
 }
 
 uint64_t Building::makeBlockGroupId(uint8_t type,

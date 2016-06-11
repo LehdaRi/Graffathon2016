@@ -19,6 +19,7 @@ public:
                             const TransformationComponent& other);
 
     void translate(const Eigen::Vector3f& v);
+    void rotateY(float angle);
 
 private:
     NodeId parent_;

@@ -13,9 +13,10 @@
 
 App::App(int argc, char* argv[], MainWindow& window) :
     window_					(window),
-	mesh_shader_			(GL::ShaderProgram::simple()), // For rasterized rendering.
+	shader_			        (GL::ShaderObject::from_file(GL_VERTEX_SHADER, "shaders/VS_Simple.glsl"),
+                             GL::ShaderObject::from_file(GL_FRAGMENT_SHADER, "shaders/FS_Simple.glsl")), // For rasterized rendering.
 	time_					( (glfwSetTime(0), glfwGetTime()) ),
-	renderer_               (camera_, 1024, 768, mesh_shader_, framebuffer_)
+	renderer_               (camera_, 1024, 768, shader_, framebuffer_)
 {
 	// Window.
 	int width, height;
@@ -25,6 +26,9 @@ App::App(int argc, char* argv[], MainWindow& window) :
 	image_ = GL::Texture::empty_2D(width, height);
 	depth_ = GL::Texture::empty_2D_depth(width, height);
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
+
+    camera_.lookAt({0.0f, 1.0f, 25.0f}, {0.0f, 7.0f, 0.0f});
+    camera_.perspective(1024, 768, PI/2, 0.1f, 100.0f);
 
 	// Spline.
 	spline_.addControlPoint({10, 1, 0});
@@ -48,6 +52,8 @@ App::App(int argc, char* argv[], MainWindow& window) :
 void App::loop(void) {
 	while (!glfwWindowShouldClose(window_)) {
 		time_ = glfwGetTime();
+
+        camera_.lookAt({25.0f*sinf(time_), 10.0f, 25.0f*cosf(time_)}, {0.0f, 10.0f, 0.0f});
 
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);

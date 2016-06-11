@@ -33,8 +33,8 @@ void Renderer::operator()(MeshComponent& component) {
 
 	// Camera.
 	float time_ = 0.0f; //TEMP
-	Vector3f eye = Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
-	camera_.lookAt(eye);
+	//Vector3f eye = Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
+	//camera_.lookAt(eye);
 	//Matrix4f view = camera.getOrientation();
 	//Matrix4f projection = camera.getPerspective();
 

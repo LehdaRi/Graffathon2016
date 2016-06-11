@@ -52,7 +52,7 @@ private:
     static std::unordered_map<uint64_t, std::vector<Mesh>> blocks__;
 
     //  type:
-    //  0: side, 1: corner
+    //  0: side, 1: corner, 2: inv.corner
     static uint64_t makeBlockGroupId(uint8_t type, uint8_t wRight, uint8_t wTop, uint8_t wLeft, uint8_t wBottom);
     static Mesh& getRandomBlock(uint64_t groupId);
 };

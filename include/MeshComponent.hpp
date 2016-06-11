@@ -12,6 +12,7 @@ public:
     friend class Renderer;
 
     MeshComponent(const NodeId& node, Mesh* mesh);
+    MeshComponent(const NodeId& node, const MeshComponent& other);
 
 private:
     NodeId node_;

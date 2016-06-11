@@ -15,6 +15,8 @@ public:
 
     TransformationComponent(const NodeId& parent,
                             const Eigen::Matrix4f& m = Eigen::Matrix4f::Identity());
+    TransformationComponent(const NodeId& parent,
+                            const TransformationComponent& other);
 
     void translate(const Eigen::Vector3f& v);
 

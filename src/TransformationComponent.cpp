@@ -10,6 +10,12 @@ TransformationComponent::TransformationComponent(const NodeId& parent, const Mat
     m_  (m)
 {}
 
+TransformationComponent::TransformationComponent(const NodeId& parent,
+                                                 const TransformationComponent& other) :
+    parent_((parent && parent.ref().hasComponent<TransformationComponent>()) ? parent : NodeId()),
+    m_  (other.m_)
+{}
+
 void TransformationComponent::translate(const Vector3f& v) {
     Matrix4f tm;
     tm <<   Matrix3f::Identity(),           v,

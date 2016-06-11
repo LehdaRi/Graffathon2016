@@ -12,9 +12,18 @@
 class BuildingFloor {
 public:
     BuildingFloor(std::default_random_engine& r, const NodeId& bRoot);
+    BuildingFloor(const BuildingFloor& other, const NodeId& bRoot,
+                  const Eigen::Vector3f& translation);
+
+    BuildingFloor(const BuildingFloor&)             = delete;
+    BuildingFloor(BuildingFloor&&);
+    BuildingFloor& operator=(const BuildingFloor&)  = delete;
+    BuildingFloor& operator=(BuildingFloor&&);
+
+    ~BuildingFloor(void);
 
 private:
-    NodeId root_;
+    NodeId              root_;
     std::vector<NodeId> rooms_;
 };
 
@@ -36,8 +45,8 @@ public:
     static void loadBlockMeshes(void);
 
 private:
-    NodeId  root_;
-    std::vector<BuildingFloor> floors_;
+    NodeId                      root_;
+    std::vector<BuildingFloor>  floors_;
 
     static std::default_random_engine  r__;
     static std::unordered_map<uint64_t, std::vector<Mesh>> blocks__;

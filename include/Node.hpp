@@ -19,6 +19,7 @@ public:
     bool isValid(void) const;
     NodeId getId(void) const;
     unsigned getChildrenNumber(void) const;
+	NodeId getParent(void) const { return parent_; }
 
     void print(void);    //TEMP
 
@@ -26,6 +27,7 @@ public:
     bool hasComponent(void) const;
     template <typename T_Component>
     T_Component& getComponent(void);
+
 
 private:
     uint64_t id_;

@@ -18,8 +18,11 @@ public:
     TransformationComponent(const NodeId& parent,
                             const TransformationComponent& other);
 
-    void translate(const Eigen::Vector3f& v);
-    void rotateY(float angle);
+    void translate (const Eigen::Vector3f& v);
+    void rotateY   (float angle);
+
+	const Eigen::Matrix4f& getTransformRelative   (void) const { return m_; }
+	const Eigen::Matrix4f& getTransformCumulative (void) const { return mCumulative_; }
 
 private:
     NodeId parent_;

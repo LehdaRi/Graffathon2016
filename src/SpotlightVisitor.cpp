@@ -1,9 +1,7 @@
 #include "SpotlightVisitor.h"
 
 #include "GLFunctions.h"
-#include "GLObjects.h"
 #include "Renderer.hpp"
-#include "Camera.hpp"
 #include "Scene.hpp"
 
 void SpotlightVisitor::operator()(SpotlightComponent& component)

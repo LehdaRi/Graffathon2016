@@ -5,7 +5,7 @@
 #include "ComponentBase.hpp"
 #include "Node.hpp"
 #include "Camera.hpp"
-#include "Renderer.hpp"
+#include "SpotlightRenderer.hpp"
 
 
 #include <Eigen/Dense>
@@ -49,7 +49,7 @@ private:
 	Eigen::Matrix4f m_worldToClip;
 
 	GL::ShaderProgram m_shader;
-	Renderer m_renderer;
+	SpotlightRenderer m_renderer;
 
 	void updateTransform();
 };

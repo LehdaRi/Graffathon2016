@@ -12,6 +12,7 @@ class TransformationComponent : public ComponentBase {
 public:
     friend class TransformationVisitor;
     friend class Renderer;
+    friend class SpotlightRenderer;
 
     TransformationComponent(const NodeId& parent,
                             const Eigen::Matrix4f& m = Eigen::Matrix4f::Identity());

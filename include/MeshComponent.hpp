@@ -10,6 +10,7 @@
 class MeshComponent : public ComponentBase {
 public:
     friend class Renderer;
+    friend class SpotlightRenderer;
 
     MeshComponent(const NodeId& node, Mesh* mesh);
     MeshComponent(const NodeId& node, const MeshComponent& other);

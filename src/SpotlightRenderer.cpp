@@ -1,11 +1,9 @@
-#include "Renderer.hpp"
+#include "SpotlightRenderer.hpp"
 #include "Camera.hpp"
 #include "GLObjects.h"
 #include "GLUtils.h"
 #include "Node.hpp"
 #include "TransformationComponent.hpp"
-#include "DepthVisitor.hpp"
-#include "Scene.hpp"
 
 #include <Eigen/Dense>
 
@@ -13,8 +11,8 @@
 using namespace Eigen;
 
 
-Renderer::Renderer(Camera& camera, uint32_t width, uint32_t height,
-                   GL::ShaderProgram& shader, GL::FBO& framebuffer) :
+SpotlightRenderer::SpotlightRenderer(Camera& camera, uint32_t width, uint32_t height,
+                                     GL::ShaderProgram& shader, GL::FBO& framebuffer) :
     camera_         (camera),
     width_          (width),
     height_         (height),
@@ -24,7 +22,7 @@ Renderer::Renderer(Camera& camera, uint32_t width, uint32_t height,
 	camera_.perspective(width, height, PI/2);
 }
 
-void Renderer::operator()(MeshComponent& component) {
+void SpotlightRenderer::operator()(MeshComponent& component) {
     auto& tc = component.node_.ref().getComponent<TransformationComponent>();
     Matrix4f model = tc.mCumulative_;
 
@@ -35,11 +33,6 @@ void Renderer::operator()(MeshComponent& component) {
 
 	Matrix4f model_to_clip = camera_.getPerspective() * camera_.getOrientation() * model;
 	Matrix3f normal_to_world = model.block<3, 3>(0, 0).inverse().transpose();
-
-	// Get the depth texture GLuints.
-	// They will be available in the vector depthVisitor.depthTexUints.
-	DepthVisitor depthVisitor;
-	SCENE(depthVisitor);
 
 	// Get the uniform locations from OpenGL.
 	GLuint model_to_clip_uniform, normal_to_world_uniform;

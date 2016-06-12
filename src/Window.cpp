@@ -22,7 +22,7 @@ MainWindow::MainWindow(int width, int height, const char* title)
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        window_p_ = glfwCreateWindow(width, height, title, NULL, NULL);
+        window_p_ = glfwCreateWindow(width, height, title, glfwGetPrimaryMonitor(), NULL);
         if (!window_p_) {
                 glfwTerminate();
                 throw std::runtime_error("Failed to open the main window.");

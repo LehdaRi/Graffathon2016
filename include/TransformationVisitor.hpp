@@ -8,7 +8,13 @@
 
 class TransformationVisitor : public Visitor<TransformationVisitor, TransformationComponent> {
 public:
+    TransformationVisitor();
+
     void operator()(TransformationComponent& component);
+
+    int mode;
+    float magnitude;
+    double time;
 };
 
 

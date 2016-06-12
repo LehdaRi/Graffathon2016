@@ -14,6 +14,7 @@ public:
 
     const Eigen::Matrix4f& getOrientation(void) const;
     const Eigen::Matrix4f& getPerspective(void) const;
+    const Eigen::Vector3f& getPosition(void) const;
 
 	void setOrientation(const Eigen::Matrix4f&);
 	void setPerspective(const Eigen::Matrix4f&);
@@ -21,6 +22,7 @@ public:
 private:
     Eigen::Matrix4f orientation_;
     Eigen::Matrix4f perspective_;
+    Eigen::Vector3f position_;
 };
 
 

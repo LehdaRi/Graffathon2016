@@ -6,6 +6,7 @@
 #include "ComponentBase.hpp"
 
 #include <Eigen/Dense>
+#include <random>
 
 
 class TransformationComponent : public ComponentBase {
@@ -19,6 +20,7 @@ public:
     TransformationComponent(const NodeId& parent,
                             const TransformationComponent& other);
 
+    void reset     (void);
     void translate (const Eigen::Vector3f& v);
     void rotateY   (float angle);
 
@@ -29,6 +31,10 @@ private:
     NodeId parent_;
     Eigen::Matrix4f m_;
     Eigen::Matrix4f mCumulative_;
+
+    //
+    static std::default_random_engine r__;
+    double s_[3];
 };
 
 

@@ -16,6 +16,9 @@ public:
 
     void operator()(MeshComponent& component);
 
+    float time_;
+    Eigen::Vector3f lightPos_;
+
 private:
     Camera&             camera_;
     uint32_t            width_;

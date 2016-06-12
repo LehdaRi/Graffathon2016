@@ -31,6 +31,7 @@ void Camera::lookAt(const Vector3f& eye, const Vector3f& target, const Vector3f&
                      1   ;
 
     orientation_ = rot * trans;
+    position_ = eye;
 }
 
 const Matrix4f& Camera::getOrientation(void) const {
@@ -39,6 +40,10 @@ const Matrix4f& Camera::getOrientation(void) const {
 
 const Matrix4f& Camera::getPerspective(void) const {
     return perspective_;
+}
+
+const Vector3f& Camera::getPosition(void) const {
+    return position_;
 }
 
 void Camera::setOrientation(const Eigen::Matrix4f& orientation)

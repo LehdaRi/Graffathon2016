@@ -13,6 +13,7 @@
 #include "BSpline.h"
 
 #include <cstdint>
+#include <deque>
 
 //--------------------
 
@@ -39,19 +40,24 @@ private:
 	GL::Texture         image_;
 	GL::Texture         depth_;
 	GL::FBO             intermediate_FBO_;
-	// GL::Texture         final_;
-	// GL::FBO             final_FBO_;
-	double              time_;
+	GL::Texture         final_;
+	GL::FBO             final_FBO_;
+	double              time_, time2_;
+	int                 bi_;
+	uint32_t            phase_;
+	Mesh                groundMesh_;
+	NodeId              groundNode_;
 
 	// NodeComponentStuffWtfThx1338
+	std::default_random_engine r_;
 	Renderer                renderer_;
     TransformationVisitor   transVisitor_;
 	SpotlightVisitor        spotlightVisitor_;
 
-	std::vector<Building>   buildings_;
+	std::deque<Building>   buildings_;
 
 	// Spline.
-	BSpline spline_;
+	BSpline spline_, spline2_;
 
 	// Skybox.
 	GL::Texture         cubemap_;

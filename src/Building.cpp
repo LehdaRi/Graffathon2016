@@ -3,10 +3,9 @@
 #include "MeshComponent.hpp"
 #include "TransformationComponent.hpp"
 #include "GLUtils.h"
-#include <ctime>
 
 
-std::default_random_engine Building::r__(time(NULL));
+std::default_random_engine Building::r__(715517);
 std::unordered_map<uint64_t, std::vector<Mesh>> Building::blocks__;
 
 
@@ -99,32 +98,6 @@ BuildingFloor::BuildingFloor(std::default_random_engine& r, const NodeId& bRoot,
     auto& tc4 = SCENE.addComponent<TransformationComponent>(c4n, root_);
     tc4.rotateY(PI/2);
     tc4.translate(Vector3f(0.0f-size/2, 0.0f, -4.0f));
-
-
-    /*for (auto i=0u; i<5; ++i) {
-        rooms_.push_back(SCENE.addNode(bRoot));
-        auto& rn = rooms_.back();
-        switch (r()%5) {
-            case 0:
-            SCENE.addComponent<MeshComponent>(rn, rn, &Building::getRandomBlock(Building::makeBlockGroupId(0, 0, 4, 4, 4)));
-            break;
-            case 1:
-            SCENE.addComponent<MeshComponent>(rn, rn, &Building::getRandomBlock(Building::makeBlockGroupId(0, 0, 4, 4, 6)));
-            break;
-            case 2:
-            SCENE.addComponent<MeshComponent>(rn, rn, &Building::getRandomBlock(Building::makeBlockGroupId(0, 0, 4, 8, 4)));
-            break;
-            case 3:
-            SCENE.addComponent<MeshComponent>(rn, rn, &Building::getRandomBlock(Building::makeBlockGroupId(0, 0, 6, 4, 4)));
-            break;
-            case 4:
-            SCENE.addComponent<MeshComponent>(rn, rn, &Building::getRandomBlock(Building::makeBlockGroupId(0, 0, 4, 4, 6)));
-            break;
-        }
-        auto& tc = SCENE.addComponent<TransformationComponent>(rn, root_);
-        tc.rotateY((r()%1000)*0.001*2*PI);
-        tc.translate(Vector3f((r()%2001)*0.01f-10.0f, 0, (r()%2001)*0.01f-10.0f));
-    }*/
 }
 
 BuildingFloor::BuildingFloor(const BuildingFloor& other, const NodeId& bRoot,
@@ -145,10 +118,13 @@ BuildingFloor::BuildingFloor(const BuildingFloor& other, const NodeId& bRoot,
 BuildingFloor::BuildingFloor(BuildingFloor&& other) :
     root_(std::move(other.root_)),
     rooms_(std::move(other.rooms_))
-{}
+{
+    other.root_ = NodeId();
+    other.rooms_.clear();
+}
 
 BuildingFloor::~BuildingFloor(void) {
-    //SCENE.deleteNode(root_);
+    SCENE.deleteNode(root_);
 }
 
 //  Building
@@ -210,43 +186,3 @@ Mesh& Building::getRandomBlock(uint64_t groupId) {
     auto& v = blocks__[groupId];
     return v[r__() % v.size()];
 }
-
-/*BuildingGenNode::BuildingGenNode(std::default_random_engine& r, const Pos& pos,
-                                 int minx, int maxx, int miny, int maxy,
-                                 int32_t dir, int32_t dis) :
-    pos_        (pos),
-    dir_        (dir),
-    dis_        (dis)
-{
-    if (r()%2 == 0 && dir_ != 0 && pos_.x+dis < maxx-6 && dis > 4)
-        children_.emplace_back(r, Pos{pos_.x+dis, pos_.y}, minx, maxx, miny, maxy, 2, dis-2);
-    if (r()%2 == 0 && dir_ != 1 && pos_.y+dis < maxy-6 && dis > 4)
-        children_.emplace_back(r, Pos{pos_.x, pos_.y+dis}, minx, maxx, miny, maxy, 3, dis-2);
-    if (r()%2 == 0 && dir_ != 2 && pos_.x-dis > minx+6 && dis > 4)
-        children_.emplace_back(r, Pos{pos_.x-dis, pos_.y}, minx, maxx, miny, maxy, 0, dis-2);
-    if (r()%2 == 0 && dir_ != 3 && pos_.y-dis > miny+6 && dis > 4)
-        children_.emplace_back(r, Pos{pos_.x, pos_.y-dis}, minx, maxx, miny, maxy, 1, dis-2);
-}
-
-std::vector<BuildingGenNode::Pos> BuildingGenNode::getPathNodes(void) {
-    std::vector<Pos> posv;
-    for (auto& c : children_)
-        c.addPathNodes(posv);
-
-    return posv;
-}
-
-void BuildingGenNode::addPathNodes(std::vector<Pos>& posv) {
-    std::sort(children_.begin(), children_.end(), [this](BuildingGenNode& a, BuildingGenNode& b){
-        int ad = a.dir_-2-dir_;
-        if (ad < 0) ad += 4;
-        int bd = b.dir_-2-dir_;
-        if (bd < 0) bd += 4;
-        return ad < bd;
-    });
-
-    printf("%i, %i\n", pos_.x, pos_.y);
-    for (auto& c : children_)
-        c.addPathNodes(posv);
-}
-*/

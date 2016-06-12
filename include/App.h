@@ -34,7 +34,7 @@ private:
 	Canvas              canvas_;
 	Camera              camera_;
 	GL::ShaderProgram   shader_;
-	GL::ShaderProgram postprocess_shader_;
+	GL::ShaderProgram   postprocess_shader_;
 	GL::Texture         image_;
 	GL::Texture         depth_;
 	GL::FBO             framebuffer_;

@@ -31,16 +31,8 @@ void Renderer::operator()(MeshComponent& component) {
 
 	gl::Viewport(0, 0, width_, height_);
 
-	// Camera.
-	float time_ = 0.0f; //TEMP
-	//Vector3f eye = Vector3f(10 * std::sin(time_), 2, 10*std::cos(time_));
-	//camera_.lookAt(eye);
-	//Matrix4f view = camera.getOrientation();
-	//Matrix4f projection = camera.getPerspective();
-
-	// We'll assume that the mesh is already in world space.
 	Matrix4f model_to_clip = camera_.getPerspective() * camera_.getOrientation() * model;
-	Matrix3f normal_to_world = Matrix3f::Identity();
+	Matrix3f normal_to_world = model.block<3, 3>(0, 0).inverse().transpose();
 
 	// Get the uniform locations from OpenGL.
 	GLuint model_to_clip_uniform, normal_to_world_uniform;

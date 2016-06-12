@@ -3,7 +3,7 @@
 //--------------------
 
 int main(int argc, char* argv[]) {
-    MainWindow mainWindow(1024, 768, "KOUVOLA.EXE");
+    MainWindow mainWindow(1440, 900, "KOUVOLA.EXE");
 
     //  LOAD BLOXXXX
     Building::loadBlockMeshes();

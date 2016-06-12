@@ -36,7 +36,9 @@ public:
 public:
         static Texture from_png(const char* filename);
         static Texture empty_2D(int width, int height);
+		static Texture empty_2D_multisample(int width, int height, int samples = 4);
         static Texture empty_2D_depth(int width, int height);
+		static Texture empty_2D_multisample_depth(int width, int height, int samples = 4);
         static Texture empty_cube(int resolution);
         static Texture empty_cube_depth(int resolution);
         static Texture buffer_texture(const Buffer& buffer, GLenum format); // TODO: Width.
@@ -71,8 +73,10 @@ public:
         FBO& operator=(FBO&&);
         operator GLuint(void) const {return fbo_;}
 public:
-        static FBO simple_C0(const Texture& color);
-        static FBO simple_C0D(const Texture& color, const Texture& depth);
+        static FBO simple_C0       (const Texture& color);
+        static FBO simple_C0D      (const Texture& color, const Texture& depth);
+        static FBO multisample_C0  (const Texture& color);
+        static FBO multisample_C0D (const Texture& color, const Texture& depth);
 private:
         GLuint fbo_;
 };

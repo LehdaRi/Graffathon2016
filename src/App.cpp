@@ -24,19 +24,22 @@ App::App(int argc, char* argv[], MainWindow& window) :
 	postprocess_shader_     (GL::ShaderObject::from_file(GL_VERTEX_SHADER, "shaders/VS_PostProcess2.glsl"),
 	                         GL::ShaderObject::from_file(GL_FRAGMENT_SHADER, "shaders/FS_PostProcess2.glsl")),
 	time_					( (glfwSetTime(0), glfwGetTime()) ),
-	renderer_               (camera_, 1024, 768, shader_, framebuffer_)
+	renderer_               (camera_, 1440, 900, shader_, intermediate_FBO_)
 {
 	// Window.
 	int width, height;
 	glfwGetFramebufferSize(window_, &width, &height);
 
 	// Textures & framebuffers.
-	image_ = GL::Texture::empty_2D(width, height);
-	depth_ = GL::Texture::empty_2D_depth(width, height);
-	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
+	image_            = GL::Texture::empty_2D_multisample(width, height, 4);
+	depth_            = GL::Texture::empty_2D_multisample_depth(width, height, 4);
+	intermediate_FBO_ = GL::FBO::multisample_C0D(image_, depth_);
+
+	// final_            = GL::Texture::empty_2D_multisample(width, height, 4);
+	// final_FBO_        = GL::FBO::multisample_C0D(final_, depth_);
 
     camera_.lookAt({0.0f, 1.0f, 25.0f}, {0.0f, 7.0f, 0.0f});
-    camera_.perspective(1024, 768, PI/2, 1.0f, 350.0f);
+    camera_.perspective(width, height, PI/2, 1.0f, 350.0f);
 
 	// Test spline.
 	spline_.addControlPoint({10, 1, 0});
@@ -61,6 +64,7 @@ App::App(int argc, char* argv[], MainWindow& window) :
 	// Stuff.
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
+	gl::Enable(GL_MULTISAMPLE);
 
 	/*
 	sf::Music music;
@@ -81,15 +85,24 @@ void App::loop(void) {
 		camera_.perspective(width, height, PI/2, 1.0f, 350.0f);
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
-		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, intermediate_FBO_);
 
 		SCENE(transVisitor_);
 		SCENE(spotlightVisitor_);
 		SCENE(renderer_);
 
-		gl::ClearColor(0.15, 0.1, 0.1, 1);
-		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		postprocess(image_, width, height);
+		// The PostProcessing2 shader doesn't work because multisampled textures need
+		// texelfetch() instead of texture() in the shader.
+
+		// gl::ClearColor(0.15, 0.1, 0.1, 1);
+		// GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, final_FBO_);
+		// postprocess(image_, width, height, final_FBO_);
+
+		// This blitting could possibly be done in a smarter way.
+		// Just copied it from somewhere on the internet...
+		gl::BindFramebuffer(GL_READ_FRAMEBUFFER, intermediate_FBO_);
+		gl::BindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		gl::BlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 		glfwSwapBuffers(window_);
 		glfwPollEvents();
@@ -131,21 +144,21 @@ void App::postprocess(const GL::Texture& input, int width, int height, GLuint fr
 	GLint old_active; gl::GetIntegerv(GL_ACTIVE_TEXTURE, &old_active);
 
 	gl::ActiveTexture(GL_TEXTURE1);
-	GLint old_tex1; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex1);
-	gl::BindTexture(GL_TEXTURE_2D, input);
+	GLint old_tex1; gl::GetIntegerv(GL_TEXTURE_BINDING_2D_MULTISAMPLE, &old_tex1);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, input);
 
 	gl::ActiveTexture(GL_TEXTURE2);
-	GLint old_tex2; gl::GetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex2);
-	gl::BindTexture(GL_TEXTURE_2D, depth_);
+	GLint old_tex2; gl::GetIntegerv(GL_TEXTURE_BINDING_2D_MULTISAMPLE, &old_tex2);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, depth_);
 
 	gl::BindVertexArray(canvas_.vao_);
 	gl::DrawArrays(canvas_.primitive_type_, 0, canvas_.num_vertices_);
 	gl::BindVertexArray(0);
 
     gl::ActiveTexture(GL_TEXTURE1);
-	gl::BindTexture(GL_TEXTURE_2D, old_tex1);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, old_tex1);
 	gl::ActiveTexture(GL_TEXTURE2);
-	gl::BindTexture(GL_TEXTURE_2D, old_tex2);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, old_tex2);
 	gl::ActiveTexture(old_active);
 
 	gl::UseProgram(0);

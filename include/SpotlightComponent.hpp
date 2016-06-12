@@ -49,7 +49,6 @@ private:
 	Eigen::Matrix4f m_worldToClip;
 
 	GL::ShaderProgram m_shader;
-	SpotlightRenderer m_renderer;
 
 	void updateTransform();
 };

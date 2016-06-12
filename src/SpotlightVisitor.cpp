@@ -11,5 +11,7 @@ void SpotlightVisitor::operator()(SpotlightComponent& component)
 	gl::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	GL::clear(GL_DEPTH_BUFFER_BIT, component.m_fbo);
 
-	SCENE(component.m_renderer);
+	Renderer renderer(component.m_camera, component.m_shadowMap.width_, component.m_shadowMap.height_, component.m_shader, component.m_fbo);
+
+	SCENE(renderer);
 }

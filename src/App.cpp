@@ -36,9 +36,9 @@ App::App(int argc, char* argv[], MainWindow& window) :
 	framebuffer_ = GL::FBO::simple_C0D(image_, depth_);
 
     camera_.lookAt({0.0f, 1.0f, 25.0f}, {0.0f, 7.0f, 0.0f});
-    camera_.perspective(1024, 768, PI/2, 3.0f, 250.0f);
+    camera_.perspective(1024, 768, PI/2, 1.0f, 350.0f);
 
-	// Spline.
+	// Test spline.
 	spline_.addControlPoint({10, 1, 0});
 	spline_.addControlPoint({10, 1, 10});
 	spline_.addControlPoint({0, 1, 10});
@@ -74,10 +74,11 @@ void App::loop(void) {
 	while (!glfwWindowShouldClose(window_)) {
 		time_ = glfwGetTime();
 
-        camera_.lookAt({50.0f*sinf(time_*0.125f), 10.0f, 50.0f*cosf(time_*0.125f)}, {0.0f, 10.0f, 0.0f});
-
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);
+
+        camera_.lookAt({55.0f*sinf(time_*0.125f), 20.0f, 55.0f*cosf(time_*0.125f)}, {0.0f, 10.0f, 0.0f});
+		camera_.perspective(width, height, PI/2, 1.0f, 350.0f);
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);

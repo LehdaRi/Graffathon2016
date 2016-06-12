@@ -14,8 +14,7 @@ SpotlightComponent::SpotlightComponent(const NodeId& node, const SpotlightDef& d
 	m_node      (node),
 	m_shadowMap (GL::Texture::empty_2D_depth(def.mapSize, def.mapSize)),
 	m_colorMap  (GL::Texture::empty_2D(def.mapSize, def.mapSize)),
-	m_shader    (GL::ShaderProgram::simple()),
-	m_renderer  (m_camera, def.mapSize, def.mapSize, m_shader, m_fbo)
+	m_shader    (GL::ShaderProgram::simple())
 {
 	m_fbo = GL::FBO::simple_C0D(m_colorMap, m_shadowMap);
 	auto parent = m_node.ref().getParent();

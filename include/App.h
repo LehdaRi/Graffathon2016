@@ -9,6 +9,7 @@
 #include "Building.hpp"
 #include "Renderer.hpp"
 #include "TransformationVisitor.hpp"
+#include "SpotlightVisitor.h"
 #include "BSpline.h"
 
 #include <cstdint>
@@ -43,6 +44,8 @@ private:
 	// NodeComponentStuffWtfThx1338
 	Renderer                renderer_;
     TransformationVisitor   transVisitor_;
+	SpotlightVisitor        spotlightVisitor_;
+
 	std::vector<Building>   buildings_;
 
 	// Spline.

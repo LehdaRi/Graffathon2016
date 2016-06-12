@@ -81,7 +81,9 @@ void App::loop(void) {
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);
 		GL::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, framebuffer_);
+
 		SCENE(transVisitor_);
+		SCENE(spotlightVisitor_);
 		SCENE(renderer_);
 
 		gl::ClearColor(0.15, 0.1, 0.1, 1);

@@ -40,3 +40,13 @@ const Matrix4f& Camera::getOrientation(void) const {
 const Matrix4f& Camera::getPerspective(void) const {
     return perspective_;
 }
+
+void Camera::setOrientation(const Eigen::Matrix4f& orientation)
+{
+	orientation_ = orientation;
+}
+
+void Camera::setPerspective(const Eigen::Matrix4f& perspective)
+{
+	perspective_ = perspective;
+}

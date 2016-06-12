@@ -1,9 +1,11 @@
-#ifndef LIGHTCOMPONENT_H
-#define LIGHTCOMPONENT_H
+#ifndef SPOTLIGHTCOMPONENT_H
+#define SPOTLIGHTCOMPONENT_H
 
 #include "GLObjects.h"
 #include "ComponentBase.hpp"
 #include "Node.hpp"
+#include "Camera.hpp"
+#include "Renderer.hpp"
 
 
 #include <Eigen/Dense>
@@ -40,9 +42,16 @@ public:
 private:
 	NodeId m_node;
 	GL::Texture m_shadowMap;
+	GL::Texture m_colorMap;
+	GL::FBO m_fbo;
+
+	Camera m_camera;
 	Eigen::Matrix4f m_worldToClip;
+
+	GL::ShaderProgram m_shader;
+	Renderer m_renderer;
 
 	void updateTransform();
 };
 
-#endif // LIGHTCOMPONENT_H
+#endif // SPOTLIGHTCOMPONENT_H

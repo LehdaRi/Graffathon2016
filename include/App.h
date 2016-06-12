@@ -48,7 +48,7 @@ private:
 	// CodeComponentStuffWtf
 	Renderer                renderer_;
     TransformationVisitor   transVisitor_;
-	Building                building_;
+	std::vector<Building>   buildings_;
 
 	// Spline.
 	BSpline spline_;

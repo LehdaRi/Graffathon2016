@@ -6,7 +6,7 @@
 //--------------------
 
 int main(int argc, char* argv[]) {
-    MainWindow mainWindow(1024, 768, "GRAFFAAAAAARGH");
+    MainWindow mainWindow(1024, 768, "KOUVOLA.EXE");
 
     //  LOAD BLOXXXX
     Building::loadBlockMeshes();

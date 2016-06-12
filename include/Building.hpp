@@ -11,7 +11,7 @@
 
 class BuildingFloor {
 public:
-    BuildingFloor(std::default_random_engine& r, const NodeId& bRoot);
+    BuildingFloor(std::default_random_engine& r, const NodeId& bRoot, int size);
     BuildingFloor(const BuildingFloor& other, const NodeId& bRoot,
                   const Eigen::Vector3f& translation);
 
@@ -32,12 +32,12 @@ class Building {
 public:
     friend class BuildingFloor;
 
-    Building(void);
+    Building(int size, int nFloors, const Eigen::Vector3f& pos);
 
     Building(const Building&)               = delete;
-    Building(Building&&)                    = delete;
+    Building(Building&&);//                    = delete;
     Building& operator=(const Building&)    = delete;
-    Building& operator=(Building&&)         = delete;
+    //Building& operator=(Building&&);//         = delete;
 
     ~Building(void);
 

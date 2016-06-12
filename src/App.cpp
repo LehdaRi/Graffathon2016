@@ -8,6 +8,10 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <random>
+
+
+using namespace Eigen;
 
 //--------------------
 
@@ -44,6 +48,12 @@ App::App(int argc, char* argv[], MainWindow& window) :
 	spline_.addControlPoint({5, 10, 5});
 	spline_.addControlPoint({10, 5, 10});
 
+	//  buildingzzzzzz
+	std::default_random_engine r;
+	for (auto i=0u; i<10; ++i) {
+        buildings_.emplace_back(20+r()%30, 6+r()%10, Vector3f(0.0f, 0.0f, -100.0f+20.0f*i));
+	}
+
 	// Stuff.
 	gl::ClearColor(0.15, 0.1, 0.1, 1);
 	gl::Enable(GL_DEPTH_TEST);
@@ -53,7 +63,7 @@ void App::loop(void) {
 	while (!glfwWindowShouldClose(window_)) {
 		time_ = glfwGetTime();
 
-        camera_.lookAt({25.0f*sinf(time_), 10.0f, 25.0f*cosf(time_)}, {0.0f, 10.0f, 0.0f});
+        camera_.lookAt({50.0f*sinf(time_*0.125f), 10.0f, 50.0f*cosf(time_*0.125f)}, {0.0f, 10.0f, 0.0f});
 
 		int width, height;
 		glfwGetFramebufferSize(window_, &width, &height);

@@ -162,6 +162,40 @@ Texture Texture::empty_2D(int width, int height) {
 	return texture;
 }
 
+Texture Texture::empty_2D_multisample(int width, int height, int num_samples)
+{
+	Texture texture;
+
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D_MULTISAMPLE, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, texture);
+	gl::TexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, num_samples, GL_RGBA, width, height, false);
+	gl::TexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl::TexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, old_tex);
+
+	texture.width_ = width;
+	texture.height_ = height;
+
+	return texture;
+}
+
+Texture Texture::empty_2D_multisample_depth(int width, int height, int num_samples)
+{
+	Texture depth;
+
+	GLint old_tex; gl::GetIntegerv(GL_TEXTURE_BINDING_2D_MULTISAMPLE, &old_tex);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, depth);
+	gl::TexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, num_samples, GL_DEPTH_COMPONENT, width, height, false);
+	gl::TexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	gl::TexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	gl::BindTexture(GL_TEXTURE_2D_MULTISAMPLE, old_tex);
+
+	depth.width_ = width;
+	depth.height_ = height;
+
+	return depth;
+}
+
 Texture Texture::empty_2D_depth(int width, int height) {
 	Texture depth;
 
@@ -328,6 +362,60 @@ FBO FBO::simple_C0D(const Texture& color, const Texture& depth) {
 
 	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, color, 0);
 	gl::FramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
+
+	const GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
+	gl::DrawBuffers(1, &draw_buffer);
+
+	GLenum status = gl::CheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+		std::cerr << "Framebuffer incomplete." << std::endl;
+		throw std::runtime_error("Framebuffer incomplete.");
+	}
+
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+
+	return framebuffer;
+}
+
+FBO FBO::multisample_C0(const Texture& color)
+{
+	FBO framebuffer;
+
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	gl::ClearColor(0, 0, 0, 1);
+
+	gl::FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, color, 0);
+
+	// const GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
+	// gl::DrawBuffers(1, &draw_buffer);
+
+	GLenum status = gl::CheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+		std::cerr << "Framebuffer incomplete." << std::endl;
+		throw std::runtime_error("Framebuffer incomplete.");
+	}
+
+	gl::BindFramebuffer(GL_FRAMEBUFFER, old_fbo);
+
+	return framebuffer;
+}
+
+FBO FBO::multisample_C0D(const Texture& color, const Texture& depth)
+{
+	FBO framebuffer;
+
+	GLint old_fbo; gl::GetIntegerv(GL_FRAMEBUFFER_BINDING, &old_fbo);
+	gl::BindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	gl::Enable(GL_DEPTH_TEST);
+	gl::ClearColor(0, 0, 0, 1);
+
+	gl::FramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, color, 0);
+	gl::FramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depth, 0);
 
 	const GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
 	gl::DrawBuffers(1, &draw_buffer);

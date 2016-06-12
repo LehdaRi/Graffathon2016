@@ -38,7 +38,9 @@ private:
 	GL::ShaderProgram   postprocess_shader_;
 	GL::Texture         image_;
 	GL::Texture         depth_;
-	GL::FBO             framebuffer_;
+	GL::FBO             intermediate_FBO_;
+	// GL::Texture         final_;
+	// GL::FBO             final_FBO_;
 	double              time_;
 
 	// NodeComponentStuffWtfThx1338

@@ -11,7 +11,7 @@ BSpline::BSpline()
 	           0.0f,  0.0f,  0.0f,  1.0f;
 	m_basis /= 6.0f;
 
-	buildDerivativeBasis();
+	buildDerivativeBases();
 }
 
 void BSpline::addControlPoint(const Vector3f& point)
@@ -22,7 +22,7 @@ void BSpline::addControlPoint(const Vector3f& point)
 void BSpline::setBasis(const Matrix4f& basis)
 {
 	m_basis = basis;
-	buildDerivativeBasis();
+	buildDerivativeBases();
 }
 
 Vector3f BSpline::position(float t) const
@@ -33,6 +33,11 @@ Vector3f BSpline::position(float t) const
 Vector3f BSpline::tangent(float t) const
 {
 	return evaluate(t, TANGENT);
+}
+
+Vector3f BSpline::curvature(float t) const
+{
+	return evaluate(t, CURVATURE);
 }
 
 Vector3f BSpline::evaluate(float t, EvalType type) const
@@ -59,18 +64,19 @@ Vector3f BSpline::evaluate(float t, EvalType type) const
 	}
 	if (windowBegin < 0)
 		return Vector3f::Zero();
-	
 
-
+	// Control point matrix.
 	Matrix<float, 3, 4> points;
 	points << m_controlPoints[windowBegin],
 	          m_controlPoints[windowBegin + 1],
 	          m_controlPoints[windowBegin + 2],
 	          m_controlPoints[windowBegin + 3];
 
-	Vector4f canonicalTimeBasis;
-	canonicalTimeBasis << 1, t, t*t, t*t*t;
+	// Time vector.
+	Vector4f canonicalTime;
+	canonicalTime << 1, t, t*t, t*t*t;
 
+	// Basis matrix.
 	const Matrix4f* basis;
 	switch (type)
 	{
@@ -78,16 +84,23 @@ Vector3f BSpline::evaluate(float t, EvalType type) const
 			basis = &m_basis;
 			break;
 		case TANGENT:
-			basis = &m_derivativeBasis;
+			basis = &m_tangentBasis;
+			break;
+		case CURVATURE:
+			basis = &m_curvatureBasis;
 	}
 
-	return (points * (*basis) * canonicalTimeBasis);
+	return (points * (*basis) * canonicalTime);
 }
 
-void BSpline::buildDerivativeBasis()
+void BSpline::buildDerivativeBases()
 {
 	const auto& c1 = m_basis.col(1);
 	const auto& c2 = m_basis.col(2);
 	const auto& c3 = m_basis.col(3);
-	m_derivativeBasis << c1, 2.0f * c2, 3.0f * c3, Vector4f::Zero();
+	m_tangentBasis << c1, 2.0f * c2, 3.0f * c3, Vector4f::Zero();
+
+	const auto& d1 = m_tangentBasis.col(1);
+	const auto& d2 = m_tangentBasis.col(2);
+	m_curvatureBasis << d1, 2.0f * d2, Vector4f::Zero(), Vector4f::Zero();
 }

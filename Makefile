@@ -9,7 +9,7 @@ DEPDIR   := dep
 CXX      := g++
 CPPFLAGS := -DGLFW_INCLUDE_GLCOREARB
 CXXFLAGS := -g -O0 -Wall -Wextra -Wshadow -pedantic
-LDLIBS   := -lGL -lglfw
+LDLIBS   := -lGL -lglfw -lsfml-audio
 INCL     := -Iinclude
 
 # These should not be modified.

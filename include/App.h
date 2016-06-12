@@ -26,13 +26,7 @@ public:
 	void     loop               (void);
 
 private:
-	//void     raymarch           (int width, int height, GLuint framebuffer = 0);
-	void     render_texture        (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	//void     render_mesh           (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
-	//void     render_mesh_on_spline (const Mesh& mesh, int width, int height, GLuint framebuffer = 0);
-	//void     render_on_cube        (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-	//void     render_on_torus       (const GL::Texture& texture, int width, int height, GLuint framebuffer = 0);
-
+	void     postprocess        (const GL::Texture& input, int width, int height, GLuint framebuffer = 0);
 
 private:
 	// Framework objects.
@@ -40,12 +34,13 @@ private:
 	Canvas              canvas_;
 	Camera              camera_;
 	GL::ShaderProgram   shader_;
+	GL::ShaderProgram postprocess_shader_;
 	GL::Texture         image_;
 	GL::Texture         depth_;
 	GL::FBO             framebuffer_;
 	double              time_;
 
-	// CodeComponentStuffWtf
+	// NodeComponentStuffWtfThx1338
 	Renderer                renderer_;
     TransformationVisitor   transVisitor_;
 	std::vector<Building>   buildings_;

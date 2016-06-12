@@ -1,7 +1,4 @@
 #include "App.h"
-#include "gl_api.hpp"
-
-#define GLEW_STATIC
 
 //--------------------
 
